@@ -179,9 +179,9 @@ namespace WpfaksDuctOMatic {
             }
         }
 
-        private double htUL = 50.0;
+        private double htUL = 60.0;
         public double HtUL { get { return htUL; } set { htUL = value; OnPropertyChanged("HtUL"); } }
-        private string strhtUL = "50";
+        private string strhtUL = "60";
         public string StrHtUL {
             get { return strhtUL; }
             set {
@@ -480,6 +480,12 @@ namespace WpfaksDuctOMatic {
         private string strGroupBoxSolutions = "Rectangular Sizes Meeting the Design Criteria";
         public string StrGroupBoxSolutions { get { return strGroupBoxSolutions; } set { strGroupBoxSolutions = value; OnPropertyChanged("StrGroupBoxSolutions"); } }
 
+        private bool airdevExpanded = false;
+        public bool AirdevExpanded { get { return airdevExpanded; } set { airdevExpanded = value; OnPropertyChanged("AirdevExpanded"); } }
+
+        private bool recsolExpanded = true;
+        public bool RecsolExpanded { get { return recsolExpanded; } set { recsolExpanded = value; OnPropertyChanged("RecsolExpanded"); } }
+        
         #region This is all about binding the duct smoothness combobox
         // This is all about binding the duct smoothness combobox list and
         // the selected value (an object) in that list.

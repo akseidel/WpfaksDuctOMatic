@@ -24,6 +24,60 @@ namespace WpfaksDuctOMatic {
             DataContext = sessionModel;
         }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e) {
+            GetInits();
+            RunSolutions();
+        }
+        
+        public void GetInits() {
+            Silent = true;
+            sessionModel.CFM = Properties.Settings.Default.setCFM;
+            sessionModel.StrVelLimit = Properties.Settings.Default.setVelLimit;
+            sessionModel.ChkVelLimit = Properties.Settings.Default.setChkVLimit;
+            sessionModel.ChkHRange = Properties.Settings.Default.setChkHRange;
+            sessionModel.ChkWRange = Properties.Settings.Default.setChkWRange;
+            sessionModel.ObLiner1 = Properties.Settings.Default.obLiner1;
+            sessionModel.ObLiner5 = Properties.Settings.Default.obLiner5;
+            sessionModel.ObLinerN = Properties.Settings.Default.obLinerN;
+            sessionModel.ObDTRect = Properties.Settings.Default.obRect;
+            sessionModel.ObDTFO = Properties.Settings.Default.obDTFO;
+            sessionModel.StrMaxAR = Properties.Settings.Default.MaxAR;
+            sessionModel.LphMargin = Properties.Settings.Default.LphMargin;
+            sessionModel.RecsolExpanded = Properties.Settings.Default.RecSolExpanded;
+            sessionModel.AirdevExpanded = Properties.Settings.Default.AirDevExpanded;
+            sessionModel.StrWtLL = Properties.Settings.Default.StrWtLL;
+            sessionModel.StrWtUL = Properties.Settings.Default.StrWtUL;
+            sessionModel.StrHtLL = Properties.Settings.Default.StrHtLL;
+            sessionModel.StrHtUL = Properties.Settings.Default.StrHtUL;
+            Top = Properties.Settings.Default.Loc_Top;
+            Left = Properties.Settings.Default.Loc_Left;
+            Silent = false;
+        }
+
+        public void SaveState() {
+            Properties.Settings.Default.Loc_Top = Top;
+            Properties.Settings.Default.Loc_Left = Left;
+            Properties.Settings.Default.setCFM = sessionModel.CFM;
+            Properties.Settings.Default.setVelLimit = sessionModel.StrVelLimit;
+            Properties.Settings.Default.setChkVLimit = sessionModel.ChkVelLimit;
+            Properties.Settings.Default.setChkHRange = sessionModel.ChkHRange;
+            Properties.Settings.Default.setChkWRange = sessionModel.ChkWRange;
+            Properties.Settings.Default.obLiner1 = sessionModel.ObLiner1;
+            Properties.Settings.Default.obLiner5 = sessionModel.ObLiner5;
+            Properties.Settings.Default.obLinerN = sessionModel.ObLinerN;
+            Properties.Settings.Default.obRect = sessionModel.ObDTRect;
+            Properties.Settings.Default.obDTFO = sessionModel.ObDTFO;
+            Properties.Settings.Default.MaxAR = sessionModel.StrMaxAR;
+            Properties.Settings.Default.LphMargin = sessionModel.LphMargin;
+            Properties.Settings.Default.RecSolExpanded = sessionModel.RecsolExpanded;
+            Properties.Settings.Default.AirDevExpanded = sessionModel.AirdevExpanded;
+            Properties.Settings.Default.StrWtLL = sessionModel.StrWtLL;
+            Properties.Settings.Default.StrWtUL = sessionModel.StrWtUL;
+            Properties.Settings.Default.StrHtLL = sessionModel.StrHtLL;
+            Properties.Settings.Default.StrHtUL = sessionModel.StrHtUL;
+            Properties.Settings.Default.Save();
+        }
+
         private void SetToNullState(bool includeDV) {
             if (includeDV) {
                 sessionModel.StrEquivCircDiameter = "Diameter (IN): N/A";
@@ -420,7 +474,7 @@ namespace WpfaksDuctOMatic {
                 msg = msg + " a selection when the 'LPH Boundary' value is high and the CFM is small.";
                 msg = msg + "\n\n" + "Duct sizes can also result in air velocities larger";
                 msg = msg + " than the velocity limit.";
-                 
+
                 sessionModel.SolutionsMsg = msg;
                 sessionModel.Ductshapevis = Visibility.Hidden;
             } else {
@@ -570,10 +624,6 @@ namespace WpfaksDuctOMatic {
             RunSolutions();
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e) {
-            RunSolutions();
-        }
-
         private void SolutionsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             UpDateDuctGraphic();
         }
@@ -631,6 +681,9 @@ namespace WpfaksDuctOMatic {
                 }
             }
         }
-       
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+            SaveState();
+        }
     } /// main window class
 }
