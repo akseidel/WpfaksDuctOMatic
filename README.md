@@ -3,12 +3,11 @@
 #  HVAC Air Duct Size Design Tool
 
 -  DuctOMatic is a Ductulator providing HVAC duct size solutions a real manual Ductulator cannot do.
--  The DuctOMatic HVAC duct sizer application directly cranks out your duct size solutions instead of imitating the circular Ductulator slide rule that brought you short of the final answer you need.
 
 ![Duct-O-Matic](Images/Duct0Matic-01.PNG)
 ##  How To Use
 
--  Run the program.
+-  Run the program. (This is a windows application.)
 -  Enter the CFM.
 -  Select the duct liner choice. Duct sizes are the outside sheet metal sizes. The air stream area is reduced by the duct liner.
 -  Select the surface roughness. The manual Ductulator does not account for surface roughness.
