@@ -593,7 +593,7 @@ namespace WpfaksDuctOMatic {
         }
 
         private void Entry_TextChanged(object sender, TextChangedEventArgs e) {
-            CalcCircularAndTableSolutions();
+            RunSolutions();
         }
 
         private void ACheckBoxWasChanged_Click(object sender, RoutedEventArgs e) {
@@ -601,7 +601,7 @@ namespace WpfaksDuctOMatic {
         }
 
         private void TB_VELLIIMIT_TextChanged(object sender, TextChangedEventArgs e) {
-            if (sessionModel.ChkVelLimit && sessionModel.VelLimit > 0) { CalcCircularAndTableSolutions(); }
+            if (sessionModel.ChkVelLimit && sessionModel.VelLimit > 0) { RunSolutions(); }
         }
 
         private void ManualRectSizeChanged_TextChanged(object sender, TextChangedEventArgs e) {
@@ -609,7 +609,7 @@ namespace WpfaksDuctOMatic {
         }
 
         private void TB_MAXAR_TextChanged(object sender, TextChangedEventArgs e) {
-            CalcCircularAndTableSolutions();
+            RunSolutions();
         }
 
         private void DuctTypeSelection_Checked(object sender, RoutedEventArgs e) {
