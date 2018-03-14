@@ -94,7 +94,7 @@ namespace WpfaksDuctOMatic {
         /// <summary>
         /// calculates the ashre circular soultion 
         /// </summary>
-        public void CalcCircularSolution() {
+        public void CalcCircularAndTableSolutions() {
             if (!IsInitialized | !IsLoaded) { return; }
             if (FlunkCriticals()) { return; };
             double req_airstream_CirDctDiam = 0;
@@ -111,7 +111,6 @@ namespace WpfaksDuctOMatic {
             double vellimit = sessionModel.VelLimit;
             // sf of duct per ft of duct, i.e. material use
             if (!(Silent)) {
-                // try {
                 SetToNullState(true);
                 req_airstream_CirDctDiam = ReqEqvCirDuct(cfm, lossperhundred, surfe, colebrook, limitthevelocity, vellimit);
                 ductouterdiam = req_airstream_CirDctDiam + 2 * ductLinerInches;
@@ -124,9 +123,6 @@ namespace WpfaksDuctOMatic {
                 sessionModel.StrEquivCircDuctVel = "Velocity: " + Vel(cfm, area_sf).ToString("#,##0") + " FPM";
                 sessionModel.StrMaterialUse = "Material/FT (SF): " + sfPft.ToString("#,##0.00");
                 RectSolu(cfm, lossperhundred, surfe, colebrook, limitthevelocity, vellimit);
-                //} catch (Exception) {
-                //    sessionModel.StrEquivCircDiameter = "Diameter (IN)= N/A";
-                //}
                 return;
             }
         }
@@ -369,7 +365,7 @@ namespace WpfaksDuctOMatic {
 
         private void RunSolutions() {
             if (FlunkCriticals()) { return; }
-            CalcCircularSolution();
+            CalcCircularAndTableSolutions();
             CalcManualSolution();
         }
 
@@ -597,7 +593,7 @@ namespace WpfaksDuctOMatic {
         }
 
         private void Entry_TextChanged(object sender, TextChangedEventArgs e) {
-            CalcCircularSolution();
+            CalcCircularAndTableSolutions();
         }
 
         private void ACheckBoxWasChanged_Click(object sender, RoutedEventArgs e) {
@@ -605,7 +601,7 @@ namespace WpfaksDuctOMatic {
         }
 
         private void TB_VELLIIMIT_TextChanged(object sender, TextChangedEventArgs e) {
-            if (sessionModel.ChkVelLimit && sessionModel.VelLimit > 0) { CalcCircularSolution(); }
+            if (sessionModel.ChkVelLimit && sessionModel.VelLimit > 0) { CalcCircularAndTableSolutions(); }
         }
 
         private void ManualRectSizeChanged_TextChanged(object sender, TextChangedEventArgs e) {
@@ -613,16 +609,16 @@ namespace WpfaksDuctOMatic {
         }
 
         private void TB_MAXAR_TextChanged(object sender, TextChangedEventArgs e) {
-            CalcCircularSolution();
+            CalcCircularAndTableSolutions();
         }
 
         private void DuctTypeSelection_Checked(object sender, RoutedEventArgs e) {
             RunSolutions();
         }
 
-        private void DoubleUpDown_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e) {
-            RunSolutions();
-        }
+        //private void DoubleUpDown_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e) {
+        //    RunSolutions();
+        //}
 
         private void SolutionsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             UpDateDuctGraphic();
@@ -684,6 +680,10 @@ namespace WpfaksDuctOMatic {
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
             SaveState();
+        }
+
+        private void LPHMarginSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+           RunSolutions();
         }
     } /// main window class
 }

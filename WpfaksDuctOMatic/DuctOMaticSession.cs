@@ -46,7 +46,7 @@ namespace WpfaksDuctOMatic {
 
         private DataTable advTable = new AirDeviceTable();
         public DataTable AdvTable { get { return advTable; } set { advTable = value; OnPropertyChanged("AdvTable"); } }
-        
+
         private DataRowView selrowadvTable;
         public DataRowView SelrowadvTable {
             get { return selrowadvTable; }
@@ -73,7 +73,7 @@ namespace WpfaksDuctOMatic {
 
         private string graphicMsg = "W x H";
         public string GraphicMsg { get { return graphicMsg; } set { graphicMsg = value; OnPropertyChanged("GraphicMsg"); } }
-        
+
         private double cFM = 1000;
         public double CFM {
             get { return cFM; }
@@ -254,14 +254,20 @@ namespace WpfaksDuctOMatic {
         }
 
         private double lphMargin = 0.85;
-        public double LphMargin { get { return lphMargin; } set { lphMargin = value; OnPropertyChanged("LphMargin"); } }
+        public double LphMargin {
+            get { return lphMargin; }
+            set {
+                lphMargin = Math.Round(value * 20) / 20;
+                OnPropertyChanged("LphMargin");
+            }
+        }
 
         private bool chkVelLimit = true;
         public bool ChkVelLimit { get { return chkVelLimit; } set { chkVelLimit = value; OnPropertyChanged("ChkVelLimit"); } }
 
         private bool chkusedevTally = false;
         public bool ChkusedevTally { get { return chkusedevTally; } set { chkusedevTally = value; OnPropertyChanged("ChkusedevTally"); } }
-        
+
         private bool chkEnHanced = true;
         public bool ChkEnHanced { get { return chkEnHanced; } set { chkEnHanced = value; OnPropertyChanged("ChkEnHanced"); } }
 
@@ -407,7 +413,7 @@ namespace WpfaksDuctOMatic {
         public bool ShowTips { get { return showTips; } set { showTips = value; OnPropertyChanged("ShowTips"); } }
 
         //CheckBoxUseTally
-        private bool chkUseTally =false;
+        private bool chkUseTally = false;
         public bool ChkUseTally { get { return chkUseTally; } set { chkUseTally = value; OnPropertyChanged("ChkUseTally"); } }
 
         private double tallyTotal = 0;
@@ -446,8 +452,8 @@ namespace WpfaksDuctOMatic {
         //////////static double DFheightLimitHigh = 120;
         ////////private double dFheightLimitHigh = 120;
         ////////public double DFheightLimitHigh { get { return dFheightLimitHigh; } set { dFheightLimitHigh = value; OnPropertyChanged("DFheightLimitHigh"); } }
-       
-        
+
+
         //private int dFPictWidth = 50;
         //public int DFPictWidth { get { return dFPictWidth; } set { dFPictWidth = value; OnPropertyChanged("DFPictWidth"); } }
         ////////////public double widthLimitLow = DFwidthLimitLow;
@@ -485,7 +491,7 @@ namespace WpfaksDuctOMatic {
 
         private bool recsolExpanded = true;
         public bool RecsolExpanded { get { return recsolExpanded; } set { recsolExpanded = value; OnPropertyChanged("RecsolExpanded"); } }
-        
+
         #region This is all about binding the duct smoothness combobox
         // This is all about binding the duct smoothness combobox list and
         // the selected value (an object) in that list.
@@ -597,6 +603,6 @@ namespace WpfaksDuctOMatic {
             Boolean result = Double.TryParse(input, out double temp);
             return result;
         }
-        
+
     }
 }
