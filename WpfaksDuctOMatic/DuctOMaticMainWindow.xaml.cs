@@ -89,13 +89,11 @@ namespace WpfaksDuctOMatic {
             bwTableSolutions.DoWork += new DoWorkEventHandler(BwTableSolutions_DoWork);
             bwTableSolutions.RunWorkerCompleted += new RunWorkerCompletedEventHandler(BwTableSolutions_RunWorkerCompleted);
 
-            timerRetryUntilNotBusy = new System.Timers.Timer(1);
-            timerRetryUntilNotBusy.Elapsed += new ElapsedEventHandler(Checkertimer_Elapsed);
+            timerRetryUntilNotBusy = new Timer(10);  // polling delay, value determined by trial
+            timerRetryUntilNotBusy.Elapsed += new ElapsedEventHandler(CheckBackgroundWorkerStateTimer_Elapsed);
         }
 
         private void RunBackgroundWorkerTableSolutions(double cfm, double lph, double surfe, bool colebrook, bool limitvelocity, double vellimit) {
-            if (!IsInitialized | !IsLoaded) { return; }
-            if (FlunkCriticals()) { return; };
             TableSolutionArgs thisTableSol = new TableSolutionArgs {
                 Cfm = cfm,
                 Lph = lph,
@@ -114,41 +112,56 @@ namespace WpfaksDuctOMatic {
                 WtLL = sessionModel.WtLL,
                 WtUL = sessionModel.WtUL
             };
-            BeginBackgroundWork(thisTableSol);
-        }
-        
-        private void BeginBackgroundWork(TableSolutionArgs argument) {
-            // (m_Argument != null)
-            // must be tested before m_BackgroundWorker.IsBusy in case a
-            // remaining task is waited to be executed by the next timer tick.
+          
+            // If not null then there is an argument pending. Throw it out and
+            // replace it with a new argument pending. This serves as both a flag
+            // here and a way to save the most current argument for the waiting
+            // backgroundworker state checker.
             if (m_Argument != null) {
-                m_Argument = argument;
+                m_Argument = thisTableSol;
                 return;
             }
+            // Check if backgroundworker is not busy.
+            // Run the not busy backgroundworker with the current argument.
             if (!bwTableSolutions.IsBusy) {
                 string solTypeText = StrSoluT();
                 sessionModel.SolTable.Clear();
                 sessionModel.Ductshapevis = Visibility.Hidden;
                 sessionModel.SolutionsMsg = "Calculating " + solTypeText + " Solutions .......";
-                bwTableSolutions.RunWorkerAsync(argument);
+                bwTableSolutions.RunWorkerAsync(thisTableSol);
                 return;
             }
-            m_Argument = argument;
+            // If here then backgroundworker is currently busy. Save this current desired
+            // argument and then issue a request to cancel the backgroundworker.
+            // Then start the backgroundworker state checker timer. 
+            m_Argument = thisTableSol;
             bwTableSolutions.CancelAsync();
             sessionModel.SolutionsMsg = "Calculation cancel is pending .....";
             timerRetryUntilNotBusy.Enabled = true;
             timerRetryUntilNotBusy.Start();
+            // The request to cancel has been issued and the state checker timer has been
+            // activated. UI returns to user but the revised table has yet to be calculated.
+            // The state checker will start the backgroundworker with the saved argument when
+            // it sees the backgroundworker not busy. 
             return;
         }
-        
-        private void Checkertimer_Elapsed(object sender, ElapsedEventArgs e) {
+
+        /// <summary>
+        /// The function called at every timer interval. It checks the backgroundworker isbusy
+        /// state. If not busy then it stops the timer and starts the backgroundworker with the
+        /// saved latest argument. The saved argument is also nulled since that aspect is used
+        /// as a flag. Otherwise the timer is allowed to remain running.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CheckBackgroundWorkerStateTimer_Elapsed(object sender, ElapsedEventArgs e) {
             if (bwTableSolutions.IsBusy) { return; }
             timerRetryUntilNotBusy.Stop();
             bwTableSolutions.RunWorkerAsync(m_Argument);
             m_Argument = null;
             return;
         }
-        
+
         private void BwTableSolutions_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             if ((e.Cancelled)) {
                 // do nothing
@@ -307,6 +320,7 @@ namespace WpfaksDuctOMatic {
                 sessionModel.DesignMsg = string.Empty;
                 sessionModel.SolutionsMsg = string.Empty;
                 sessionModel.GraphicMsg = string.Empty;
+                ReportNonStandardPLPH();
             }
         }
 
@@ -582,12 +596,11 @@ namespace WpfaksDuctOMatic {
         }
 
         private void RunSolutions() {
-           if (IsVisible && IsLoaded && IsEnabled && IsInitialized ) {
+            if (IsVisible && IsLoaded && IsEnabled && IsInitialized) {
                 if (FlunkCriticals()) { return; }
                 CalcCircularAndTableSolutions();
                 CalcManualSolution();
             }
-           
         }
 
         /// <summary>
@@ -900,6 +913,8 @@ namespace WpfaksDuctOMatic {
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+            timerRetryUntilNotBusy.Stop();
+            timerRetryUntilNotBusy.Dispose();
             if (bwTableSolutions.IsBusy == true) { bwTableSolutions.Dispose(); }
             SaveState();
         }
@@ -907,5 +922,36 @@ namespace WpfaksDuctOMatic {
         private void LPHMarginSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
             RunSolutions();
         }
+
+        /// <summary>
+        /// Here when this event happens we assume the user has 'reselected' what was showing thinking that doing so
+        /// will reset the PLPH. This function will reset the PLPH if in fact it is different.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ComboDuctClass_DropDownClosed(object sender, EventArgs e) {
+            if (IsPLPHNotMatchingWhatComboShow()) {
+                sessionModel.StrLossperhundred = sessionModel.PTypeSelected.D_PTypePLPH.ToString("0.00");
+                sessionModel.DesignMsg = "Reset PLPH to the standard value " + sessionModel.PTypeSelected.D_PTypePLPH.ToString("0.00");
+            }
+        }
+
+        private void ReportNonStandardPLPH() {
+            if (IsPLPHNotMatchingWhatComboShow()) {
+                sessionModel.DesignMsg = "Note: The PLPH is set to a custom value." ;
+            }
+        }
+      
+        /// <summary>
+        /// Returns true if PLPH entry does not equal what the combo is currently showing.
+        /// </summary>
+        /// <returns></returns>
+        private bool IsPLPHNotMatchingWhatComboShow() {
+            double deltacrit = 5E-06;
+            double delta = Math.Abs(sessionModel.Lossperhundred - sessionModel.PTypeSelected.D_PTypePLPH);
+            return (delta >= deltacrit);
+        }
+
+       
     } /// main window class
 }

@@ -368,11 +368,12 @@
                                   Grid.ColumnSpan="4"
                                   SelectedIndex="0"
                                   ItemsSource="{Binding PTypeChoices, UpdateSourceTrigger=PropertyChanged}"
-                                  SelectedItem="{Binding PTypeSelected, UpdateSourceTrigger=PropertyChanged }"
+                                  SelectedItem="{Binding PTypeSelected, UpdateSourceTrigger=PropertyChanged}"
                                   DisplayMemberPath="S_PTypedescription"
                                   VerticalAlignment="Center"
                                   Margin="10,0,0,0"
-                                  SelectionChanged="ComboBoxDuctClass_SelectionChanged">
+                                  SelectionChanged="ComboBoxDuctClass_SelectionChanged"
+                                  DropDownClosed="ComboDuctClass_DropDownClosed">
                         </ComboBox>
                         <CheckBox Content="Limit Velocity"
                                   Grid.Column="0"
@@ -955,7 +956,7 @@
                                         </Grid.RowDefinitions>
                                         <Label Grid.Row="0"
                                                Grid.Column="0"
-                                               Content="{Binding Path=LphMargin, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=0.50}"
+                                               Content="{Binding Path=LphMargin, UpdateSourceTrigger=PropertyChanged,Mode=OneWay, FallbackValue=0.86}"
                                                VerticalContentAlignment="Center"
                                                HorizontalContentAlignment="Center"
                                                Padding="4,0"
@@ -963,11 +964,12 @@
                                         <Slider x:Name="LPHMarginSlider"
                                         Grid.Row="1"
                                         Grid.Column="0"
-                                        SmallChange="0.05"
+                                        SmallChange="0.02"
                                         LargeChange="0.10"
                                         Maximum="1.0"
                                         Minimum="0.10"
                                         TickFrequency="0.1"
+                                        TickPlacement="BottomRight"
                                         Height="30"
                                         Value="{Binding Path=LphMargin, UpdateSourceTrigger=PropertyChanged, FallbackValue=0.50}"
                                         HorizontalContentAlignment="Stretch"

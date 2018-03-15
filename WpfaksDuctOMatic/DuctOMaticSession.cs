@@ -253,11 +253,11 @@ namespace WpfaksDuctOMatic {
             }
         }
 
-        private double lphMargin = 0.85;
+        private double lphMargin = 0.86;
         public double LphMargin {
             get { return lphMargin; }
             set {
-                lphMargin = Math.Round(value * 20) / 20;
+                lphMargin = Math.Round(value * 50) / 50;
                 OnPropertyChanged("LphMargin");
             }
         }
