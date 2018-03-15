@@ -231,6 +231,7 @@ namespace WpfaksDuctOMatic {
             double _dVel = 0;
             double _HtBot = 0;
             double _WtBot = 0;
+            double smallNumber = 5E-3;
 
             _maxDuct = Convert.ToInt32(Math.Truncate((maxAr - 1) * ReqEqvCirDuct(cfm, lph, surfe, colebrook, limitvelocity, vellimit)));
             _maxDuct = Convert.ToInt32(Math.Max(_maxDuct, 6));
@@ -270,7 +271,7 @@ namespace WpfaksDuctOMatic {
                         _rEqCirDct = DhEqCircRO(ductHeight, wt, dtype);
                         _tryLPH = CircDuctPLPH(cfm, _rEqCirDct, surfe, colebrook);
                         // margin check
-                        if ((_tryLPH <= lph) && (_tryLPH > lphMargin * lph)) {
+                        if ((_tryLPH <= lph) && ( (lphMargin * lph) - _tryLPH <= smallNumber )) {
                             _area_sf = DAreaRO(wt, ductHeight, dtype);
                             _dVel = Vel(cfm, _area_sf);
                             // velocity limit check, if fails then skip this for
