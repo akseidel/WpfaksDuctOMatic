@@ -61,6 +61,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="DuctOMaticSession.cs" />
+    <Compile Include="TableSolutionArgs.cs" />
     <Compile Include="SolutionsTable.cs">
       <SubType>Component</SubType>
     </Compile>

@@ -1,14 +1,18 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace WpfaksDuctOMatic {
-
     public partial class MainWindow : Window {
         public DuctOMaticSession sessionModel = new DuctOMaticSession();
+        private readonly BackgroundWorker bwTableSolutions = new BackgroundWorker();
+        static Timer timerRetryUntilNotBusy;
+        internal TableSolutionArgs m_Argument;
         bool Silent = false;
         public double Dinc;
         public double d_inc = 1;
@@ -26,9 +30,10 @@ namespace WpfaksDuctOMatic {
 
         private void Window_Loaded(object sender, RoutedEventArgs e) {
             GetInits();
+            SetUpBackgroundWorkers();
             RunSolutions();
         }
-        
+
         public void GetInits() {
             Silent = true;
             sessionModel.CFM = Properties.Settings.Default.setCFM;
@@ -78,6 +83,220 @@ namespace WpfaksDuctOMatic {
             Properties.Settings.Default.Save();
         }
 
+        private void SetUpBackgroundWorkers() {
+            bwTableSolutions.WorkerSupportsCancellation = true;
+            bwTableSolutions.WorkerReportsProgress = true;
+            bwTableSolutions.DoWork += new DoWorkEventHandler(BwTableSolutions_DoWork);
+            bwTableSolutions.RunWorkerCompleted += new RunWorkerCompletedEventHandler(BwTableSolutions_RunWorkerCompleted);
+
+            timerRetryUntilNotBusy = new System.Timers.Timer(1);
+            timerRetryUntilNotBusy.Elapsed += new ElapsedEventHandler(Checkertimer_Elapsed);
+        }
+
+        private void RunBackgroundWorkerTableSolutions(double cfm, double lph, double surfe, bool colebrook, bool limitvelocity, double vellimit) {
+            if (!IsInitialized | !IsLoaded) { return; }
+            if (FlunkCriticals()) { return; };
+            TableSolutionArgs thisTableSol = new TableSolutionArgs {
+                Cfm = cfm,
+                Lph = lph,
+                Surfe = surfe,
+                Colebrook = colebrook,
+                Limitvelocity = limitvelocity,
+                Vellimit = vellimit,
+                MaxAr = sessionModel.MaxAR,
+                DLiner = sessionModel.Dliner,
+                LphMargin = sessionModel.LphMargin,
+                Dtype = sessionModel.Dtype,
+                ChkHRange = sessionModel.ChkHRange,
+                HtLL = sessionModel.HtLL,
+                HtUL = sessionModel.HtUL,
+                ChkWRange = sessionModel.ChkWRange,
+                WtLL = sessionModel.WtLL,
+                WtUL = sessionModel.WtUL
+            };
+            BeginBackgroundWork(thisTableSol);
+        }
+        
+        private void BeginBackgroundWork(TableSolutionArgs argument) {
+            // (m_Argument != null)
+            // must be tested before m_BackgroundWorker.IsBusy in case a
+            // remaining task is waited to be executed by the next timer tick.
+            if (m_Argument != null) {
+                m_Argument = argument;
+                return;
+            }
+            if (!bwTableSolutions.IsBusy) {
+                string solTypeText = StrSoluT();
+                sessionModel.SolTable.Clear();
+                sessionModel.Ductshapevis = Visibility.Hidden;
+                sessionModel.SolutionsMsg = "Calculating " + solTypeText + " Solutions .......";
+                bwTableSolutions.RunWorkerAsync(argument);
+                return;
+            }
+            m_Argument = argument;
+            bwTableSolutions.CancelAsync();
+            sessionModel.SolutionsMsg = "Calculation cancel is pending .....";
+            timerRetryUntilNotBusy.Enabled = true;
+            timerRetryUntilNotBusy.Start();
+            return;
+        }
+        
+        private void Checkertimer_Elapsed(object sender, ElapsedEventArgs e) {
+            if (bwTableSolutions.IsBusy) { return; }
+            timerRetryUntilNotBusy.Stop();
+            bwTableSolutions.RunWorkerAsync(m_Argument);
+            m_Argument = null;
+            return;
+        }
+        
+        private void BwTableSolutions_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+            if ((e.Cancelled)) {
+                // do nothing
+            } else if (!(e.Error == null)) {
+                sessionModel.SolutionsMsg = ("Error: " + e.Error.Message);
+            } else {
+                if (e.Result == null) {
+                    sessionModel.SolutionsMsg = "Last error was: " + e.Result.ToString().Trim();
+                } else {
+                    //// The process completed successfully.
+                    sessionModel.SolTable = e.Result as SolutionsTable;
+                    if (sessionModel.SolTable.Rows.Count > 0) {
+                        // When DataTables are bound to DataGrids, the items seen in the window are
+                        // DataRowViews that correspond to the DataTable's DataRows.
+                        DataRowView sdrv = sessionModel.SolTable.DefaultView[0] as DataRowView;
+                        sessionModel.SelrowSolTable = sdrv;
+                        UpDateDuctGraphic();
+                    }
+
+                    if (sessionModel.SolTable.Rows.Count == 0 && sessionModel.ChkVelLimit) {
+                        string msg = "There are no solutions that meet all the criteria.";
+                        msg = msg + "\n\n" + "Duct sizes can have an energy loss peformance much";
+                        msg = msg + " better than how close the 'LPH Boundary' factor allows for";
+                        msg = msg + " a selection when the 'LPH Boundary' value is high and the CFM is small.";
+                        msg = msg + "\n\n" + "Duct sizes can also result in air velocities larger";
+                        msg = msg + " than the velocity limit.";
+
+                        sessionModel.SolutionsMsg = msg;
+                        sessionModel.Ductshapevis = Visibility.Hidden;
+                    } else {
+                        sessionModel.SolutionsMsg = StrSoluT() + " Solutions: " + sessionModel.SolTable.Rows.Count.ToString();
+                        sessionModel.Ductshapevis = Visibility.Visible;
+                    }
+                }
+            }
+        }
+
+        private void BwTableSolutions_DoWork(object sender, DoWorkEventArgs e) {
+            BackgroundWorker worker = sender as BackgroundWorker;
+            TableSolutionArgs TSA = e.Argument as TableSolutionArgs;
+
+            double cfm = TSA.Cfm;
+            double lph = TSA.Lph;
+            double surfe = TSA.Surfe;
+            bool colebrook = TSA.Colebrook;
+            bool limitvelocity = TSA.Limitvelocity;
+            double vellimit = TSA.Vellimit;
+            double maxAr = TSA.MaxAr;
+            double dLiner = TSA.DLiner;
+            double lphMargin = TSA.LphMargin;
+            int dtype = TSA.Dtype;
+            bool chkHRange = TSA.ChkHRange;
+            double htLL = TSA.HtLL;
+            double htUL = TSA.HtUL;
+            bool chkWRange = TSA.ChkWRange;
+            double wtLL = TSA.WtLL;
+            double wtUL = TSA.WtUL;
+            DataTable argSolTable = new SolutionsTable();//   TSA.SolutTable;
+
+            double _tryLPH = 0;
+            double _rEqCirDct = 0;
+            int _maxDuct = 0;
+            int _maxDuctH = 0;
+            int _maxDuctW = 0;
+            double _area_sf = 0;
+            string _typ = null;
+            double _dVel = 0;
+            double _HtBot = 0;
+            double _WtBot = 0;
+
+            _maxDuct = Convert.ToInt32(Math.Truncate((maxAr - 1) * ReqEqvCirDuct(cfm, lph, surfe, colebrook, limitvelocity, vellimit)));
+            _maxDuct = Convert.ToInt32(Math.Max(_maxDuct, 6));
+            // limit lower size
+            _maxDuctH = _maxDuct;
+            _maxDuctW = _maxDuct;
+            _HtBot = 6;
+            _WtBot = 6;
+            if (chkHRange) {
+                _HtBot = htLL;
+                _maxDuctH = Convert.ToInt32(htUL);
+            }
+            if (chkWRange) {
+                _WtBot = wtLL;
+                _maxDuctW = Convert.ToInt32(wtUL);
+            }
+
+            if (_HtBot == 0 | _WtBot == 0 | _maxDuctH <= 0 | _maxDuctW <= 0) {
+                return;
+            }
+
+            _typ = (dtype == 0 ? " R" : " FO");
+            double DDLiner = 2 * dLiner;
+            for (double ductHeight = _HtBot; ductHeight <= _maxDuctH; ductHeight += Dinc) {
+                if ((worker.CancellationPending)) {
+                    e.Cancel = true;
+                    return;
+                }
+                if (argSolTable.Rows.Count > 60) { break; }
+                for (double wt = _WtBot; wt <= _maxDuctW; wt += Dinc) {
+                    if ((worker.CancellationPending)) {
+                        e.Cancel = true;
+                        return;
+                    }
+                    // check ar and even size first
+                    if ((Math.Max(wt, ductHeight) / Math.Min(wt, ductHeight) <= maxAr) && ((wt + DDLiner) % 2 == 0) && ((ductHeight + DDLiner) % 2 == 0)) {
+                        _rEqCirDct = DhEqCircRO(ductHeight, wt, dtype);
+                        _tryLPH = CircDuctPLPH(cfm, _rEqCirDct, surfe, colebrook);
+                        // margin check
+                        if ((_tryLPH <= lph) && (_tryLPH > lphMargin * lph)) {
+                            _area_sf = DAreaRO(wt, ductHeight, dtype);
+                            _dVel = Vel(cfm, _area_sf);
+                            // velocity limit check, if fails then skip this for
+                            if ((limitvelocity) && (_dVel > vellimit)) {
+                                continue;
+                            }
+                            double drWt = wt + DDLiner;
+                            double drHt = ductHeight + DDLiner;
+                            double drPFT = DuctPFT(drWt, drHt, dtype);
+                            // inlist check, if already in list as reverse size then skip this solution
+                            //    if (InList(drWt, drHt)) { continue; }
+                            if (InList(drHt, drWt, argSolTable)) {
+                                continue;
+                            }
+                            DataRow dr = argSolTable.NewRow();
+                            dr[0] = drWt;
+                            dr[1] = "x";
+                            dr[2] = drHt;
+                            dr[3] = _typ;
+                            dr[4] = _tryLPH.ToString("0.000");
+                            dr[5] = _dVel.ToString("#,##0");
+                            dr[6] = (Math.Max(wt, ductHeight) / Math.Min(wt, ductHeight)).ToString("0.00");
+                            dr[7] = drPFT.ToString("0.00");
+                            argSolTable.Rows.Add(dr);
+                        }
+                    }
+                    if (argSolTable.Rows.Count > 60) {
+                        break;
+                    }
+                }
+            }
+            // sort by aspect ratio first, then by pressure loss
+            // This puts the most efficient section at the list top. 
+            // sessionModel.SolTable.DefaultView.Sort = "PFT ASC, AR ASC, PLPH DESC";
+            argSolTable.DefaultView.Sort = "AR ASC, PLPH ASC";
+            // Backgroundworker return value
+            e.Result = argSolTable;
+        }
+
         private void SetToNullState(bool includeDV) {
             if (includeDV) {
                 sessionModel.StrEquivCircDiameter = "Diameter (IN): N/A";
@@ -95,8 +314,6 @@ namespace WpfaksDuctOMatic {
         /// calculates the ashre circular soultion 
         /// </summary>
         public void CalcCircularAndTableSolutions() {
-            if (!IsInitialized | !IsLoaded) { return; }
-            if (FlunkCriticals()) { return; };
             double req_airstream_CirDctDiam = 0;
             double area_sf = 0;
             double plphft_inH2O = 0;
@@ -122,7 +339,8 @@ namespace WpfaksDuctOMatic {
                 sessionModel.StrEquivCircDuctPLPH = "PLPH: " + plphft_inH2O.ToString("0.000") + " IN H2O";
                 sessionModel.StrEquivCircDuctVel = "Velocity: " + Vel(cfm, area_sf).ToString("#,##0") + " FPM";
                 sessionModel.StrMaterialUse = "Material/FT (SF): " + sfPft.ToString("#,##0.00");
-                RectSolu(cfm, lossperhundred, surfe, colebrook, limitthevelocity, vellimit);
+                //RectSolu(cfm, lossperhundred, surfe, colebrook, limitthevelocity, vellimit);
+                RunBackgroundWorkerTableSolutions(cfm, lossperhundred, surfe, colebrook, limitthevelocity, vellimit);
                 return;
             }
         }
@@ -364,9 +582,12 @@ namespace WpfaksDuctOMatic {
         }
 
         private void RunSolutions() {
-            if (FlunkCriticals()) { return; }
-            CalcCircularAndTableSolutions();
-            CalcManualSolution();
+           if (IsVisible && IsLoaded && IsEnabled && IsInitialized ) {
+                if (FlunkCriticals()) { return; }
+                CalcCircularAndTableSolutions();
+                CalcManualSolution();
+            }
+           
         }
 
         /// <summary>
@@ -434,7 +655,7 @@ namespace WpfaksDuctOMatic {
                             double drPFT = DuctPFT(drWt, drHt, Dtype);
                             // inlist check, if already in list as reverse size then skip this solution
                             //    if (InList(drWt, drHt)) { continue; }
-                            if (InList(drHt, drWt)) { continue; }
+                            if (InList(drHt, drWt, sessionModel.SolTable)) { continue; }
                             DataRow dr = sessionModel.SolTable.NewRow();
                             dr[0] = drWt;
                             dr[1] = "x";
@@ -506,9 +727,9 @@ namespace WpfaksDuctOMatic {
         /// <param width="wt"></param>
         /// <param height="ht"></param>
         /// <returns></returns>
-        public bool InList(double wt, double ht) {
+        public bool InList(double wt, double ht, DataTable solTable) {
             string expression = "Width = " + ht + " and Height = " + wt;
-            DataRow drinlist = sessionModel.SolTable.Select(expression).FirstOrDefault();
+            DataRow drinlist = solTable.Select(expression).FirstOrDefault();
             if (drinlist != null) {
                 return true;
             }
@@ -679,11 +900,12 @@ namespace WpfaksDuctOMatic {
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+            if (bwTableSolutions.IsBusy == true) { bwTableSolutions.Dispose(); }
             SaveState();
         }
 
         private void LPHMarginSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-           RunSolutions();
+            RunSolutions();
         }
     } /// main window class
 }
