@@ -1,4 +1,5 @@
-#  WpfaksDuctOMatic&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#  WpfaksDuctOMatic&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;![](WpfaksDuctOMatic/DuctoMaticIcon.ico)
+
 
 #  HVAC Air Duct Size Design Tool
 
@@ -16,18 +17,32 @@
 -  Select the duct shape type rectangular or flat oval.
 -  Read the circular solution at the bottom and the rectangular or flat oval solutions in the table at the right.
 
+
+
 ![Duct-O-Matic](Images/Duct0Matic-03.PNG)
 
 ![Duct-O-Matic](Images/Duct0Matic-04.PNG)
+
 
 ###  Air Device Tabulator
 -  The expander at the bottom reveals a simple Air Device Tabulator.
 -  The the device values and notes as needed. The CFM will be summed.
 -  The total value mirrors to the design CFM when the Use Air Device CFM Tally is checked.
 
+###  Documentation
+-  The most important controls an features have popup tool tips to explain their operation or purpose.
+-  Activate the 'Turn On Tool Tips' check box.
+-  Hover over text and wait for the tool tip.
+
 ![Duct-O-Matic](Images/Duct0Matic-05.PNG)
 
 ![Duct-O-Matic](Images/Duct0Matic-06.PNG)
+###### Moving and Closing
+-  Drag the window around to move it.
+-  Close the application by Pressing ESC key whenever the application has focus.
 
 ###  Installation
---  Yet to write.
+-  Download the executable WpfaksDuctOMatic.exe and run it.
+-  The application first starts with default values, including its window position.
+-  The next time it runs it will reuse many values that were set when the application was last closed.
+-  More than one instance may be running.
