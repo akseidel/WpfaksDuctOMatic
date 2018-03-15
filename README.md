@@ -26,11 +26,11 @@
 
 ###  Air Device Tabulator
 -  The expander at the bottom reveals a simple Air Device Tabulator.
--  The the device values and notes as needed. The CFM will be summed.
--  The total value mirrors to the design CFM when the Use Air Device CFM Tally is checked.
+-  Enter the the device values and notes as needed. The CFM will be summed.
+-  The total value mirrors to the design CFM when the 'Use Air Device CFM Tally' checkbox is checked.
 
 ###  Documentation
--  The most important controls an features have popup tool tips to explain their operation or purpose.
+-  The most important controls and features have popup tool tips to explain their operation or purpose.
 -  Activate the 'Turn On Tool Tips' check box.
 -  Hover over text and wait for the tool tip.
 
