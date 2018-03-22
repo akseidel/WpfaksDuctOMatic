@@ -112,7 +112,7 @@ namespace WpfaksDuctOMatic {
                 WtLL = sessionModel.WtLL,
                 WtUL = sessionModel.WtUL
             };
-          
+
             // If not null then there is an argument pending. Throw it out and
             // replace it with a new argument pending. This serves as both a flag
             // here and a way to save the most current argument for the waiting
@@ -248,11 +248,7 @@ namespace WpfaksDuctOMatic {
                 _WtBot = wtLL;
                 _maxDuctW = Convert.ToInt32(wtUL);
             }
-
-            if (_HtBot == 0 | _WtBot == 0 | _maxDuctH <= 0 | _maxDuctW <= 0) {
-                return;
-            }
-
+            
             _typ = (dtype == 0 ? " R" : " FO");
             double DDLiner = 2 * dLiner;
             for (double ductHeight = _HtBot; ductHeight <= _maxDuctH; ductHeight += Dinc) {
@@ -261,6 +257,9 @@ namespace WpfaksDuctOMatic {
                     return;
                 }
                 if (argSolTable.Rows.Count > 60) { break; }
+                // Not adjusting the inner loop lower bound to eliminate mirror duplicates!! The
+                // problem with that approach is that the lower and upper dimension limits can
+                // vary.
                 for (double wt = _WtBot; wt <= _maxDuctW; wt += Dinc) {
                     if ((worker.CancellationPending)) {
                         e.Cancel = true;
@@ -270,37 +269,31 @@ namespace WpfaksDuctOMatic {
                     if ((Math.Max(wt, ductHeight) / Math.Min(wt, ductHeight) <= maxAr) && ((wt + DDLiner) % 2 == 0) && ((ductHeight + DDLiner) % 2 == 0)) {
                         _rEqCirDct = DhEqCircRO(ductHeight, wt, dtype);
                         _tryLPH = CircDuctPLPH(cfm, _rEqCirDct, surfe, colebrook);
-                        // margin check
-                        if ((_tryLPH <= lph) && ( (lphMargin * lph) - _tryLPH <= smallNumber )) {
+                        // The viable solution must first come under the lph criterium. Then 
+                        // it must be close enough to the lph according to the allowed margin factor.
+                        if ((_tryLPH <= lph) && ((lphMargin * lph) - _tryLPH <= smallNumber)) {
                             _area_sf = DAreaRO(wt, ductHeight, dtype);
                             _dVel = Vel(cfm, _area_sf);
                             // velocity limit check, if fails then skip this for
-                            if ((limitvelocity) && (_dVel > vellimit)) {
-                                continue;
-                            }
+                            if ((limitvelocity) && (_dVel > vellimit)) {continue;}
                             double drWt = wt + DDLiner;
                             double drHt = ductHeight + DDLiner;
                             double drPFT = DuctPFT(drWt, drHt, dtype);
-                            // inlist check, if already in list as reverse size then skip this solution
-                            //    if (InList(drWt, drHt)) { continue; }
-                            if (InList(drHt, drWt, argSolTable)) {
-                                continue;
-                            }
                             DataRow dr = argSolTable.NewRow();
+                            // inlist check, if already in list as reverse size then skip this solution
+                            if (InList(drHt, drWt, argSolTable)) {continue;}
                             dr[0] = drWt;
                             dr[1] = "x";
                             dr[2] = drHt;
                             dr[3] = _typ;
-                            dr[4] = _tryLPH.ToString("0.000");
+                            dr[4] = Math.Round(_tryLPH,3,MidpointRounding.AwayFromZero).ToString();
                             dr[5] = _dVel.ToString("#,##0");
-                            dr[6] = (Math.Max(wt, ductHeight) / Math.Min(wt, ductHeight)).ToString("0.00");
+                            dr[6] = Math.Round((Math.Max(wt, ductHeight) / Math.Min(wt, ductHeight)),2, MidpointRounding.AwayFromZero).ToString("0.00");
                             dr[7] = drPFT.ToString("0.00");
                             argSolTable.Rows.Add(dr);
                         }
                     }
-                    if (argSolTable.Rows.Count > 60) {
-                        break;
-                    }
+                    if (argSolTable.Rows.Count > 60) {break;}
                 }
             }
             // sort by aspect ratio first, then by pressure loss
@@ -311,8 +304,7 @@ namespace WpfaksDuctOMatic {
             e.Result = argSolTable;
         }
 
-        private void SetToNullState(bool includeDV) {
-            if (includeDV) {
+        private void SetToNullState() {
                 sessionModel.StrEquivCircDiameter = "Diameter (IN): N/A";
                 sessionModel.StrEquivCircDuctPLPH = "PLPH (IN): N/A";
                 sessionModel.StrEquivCircDuctVel = "Velocity (FPM): N/A";
@@ -322,7 +314,6 @@ namespace WpfaksDuctOMatic {
                 sessionModel.SolutionsMsg = string.Empty;
                 sessionModel.GraphicMsg = string.Empty;
                 ReportNonStandardPLPH();
-            }
         }
 
         /// <summary>
@@ -343,7 +334,6 @@ namespace WpfaksDuctOMatic {
             double vellimit = sessionModel.VelLimit;
             // sf of duct per ft of duct, i.e. material use
             if (!(Silent)) {
-                SetToNullState(true);
                 req_airstream_CirDctDiam = ReqEqvCirDuct(cfm, lossperhundred, surfe, colebrook, limitthevelocity, vellimit);
                 ductouterdiam = req_airstream_CirDctDiam + 2 * ductLinerInches;
                 plphft_inH2O = CircDuctPLPH(cfm, req_airstream_CirDctDiam, surfe, colebrook);
@@ -354,7 +344,6 @@ namespace WpfaksDuctOMatic {
                 sessionModel.StrEquivCircDuctPLPH = "PLPH: " + plphft_inH2O.ToString("0.000") + " IN H2O";
                 sessionModel.StrEquivCircDuctVel = "Velocity: " + Vel(cfm, area_sf).ToString("#,##0") + " FPM";
                 sessionModel.StrMaterialUse = "Material/FT (SF): " + sfPft.ToString("#,##0.00");
-                //RectSolu(cfm, lossperhundred, surfe, colebrook, limitthevelocity, vellimit);
                 RunBackgroundWorkerTableSolutions(cfm, lossperhundred, surfe, colebrook, limitthevelocity, vellimit);
                 return;
             }
@@ -375,7 +364,7 @@ namespace WpfaksDuctOMatic {
                     REqCirDct = DhEqCircRO(manualHeight, manualWidth, dtype);
                     area_sf = DAreaRO(manualHeight, manualWidth, dtype);
                     double drPFT = DuctPFT(manualWidth, manualHeight, dtype);
-                    msg = "PLPH: " + CircDuctPLPH(cfm, REqCirDct, surfe, colebrook).ToString("0.000");
+                    msg = "PLPH: " + Math.Round(CircDuctPLPH(cfm, REqCirDct, surfe, colebrook),3,MidpointRounding.AwayFromZero).ToString("0.000");
                     msg = msg + " IN  Velocity: " + Vel(cfm, area_sf).ToString("#,##0") + " FPM";
                     msg = msg + "  AR: " + (Math.Max(manualWidth, manualHeight) / Math.Min(manualWidth, manualHeight)).ToString("#.00");
                     msg = msg + "  P: " + drPFT.ToString("0.00");
@@ -409,7 +398,7 @@ namespace WpfaksDuctOMatic {
         /// </summary>
         /// <returns></returns>
         private bool FlunkCriticals() {
-            SetToNullState(true);
+            SetToNullState();
             if (sessionModel.CFM <= 0) {
                 sessionModel.DesignMsg = "No go! Check the CFM.";
                 return true;
@@ -420,6 +409,14 @@ namespace WpfaksDuctOMatic {
             }
             if (sessionModel.Surfe <= 0) {
                 sessionModel.DesignMsg = "No go! Check the Roughness.";
+                return true;
+            }
+            if ((sessionModel.WtLL <= 0) || (sessionModel.WtUL <= 0)) {
+                sessionModel.DesignMsg = "No go! Check width limit values.";
+                return true;
+            }
+            if ((sessionModel.HtLL <= 0) || (sessionModel.HtUL <= 0)) {
+                sessionModel.DesignMsg = "No go! Check height limit values.";
                 return true;
             }
             return false;
@@ -939,10 +936,10 @@ namespace WpfaksDuctOMatic {
 
         private void ReportNonStandardPLPH() {
             if (IsPLPHNotMatchingWhatComboShow()) {
-                sessionModel.DesignMsg = "Note: The PLPH is set to a custom value." ;
+                sessionModel.DesignMsg = "Note: The PLPH is set to a custom value.";
             }
         }
-      
+
         /// <summary>
         /// Returns true if PLPH entry does not equal what the combo is currently showing.
         /// </summary>
@@ -953,6 +950,6 @@ namespace WpfaksDuctOMatic {
             return (delta >= deltacrit);
         }
 
-       
+
     } /// main window class
 }

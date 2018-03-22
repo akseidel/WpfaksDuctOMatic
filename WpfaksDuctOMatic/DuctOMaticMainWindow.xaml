@@ -121,6 +121,49 @@
         </ToolTip>
 
         <!--Making a common tooltip for multiple places or a tooltip for some textblocks.-->
+        <ToolTip x:Key="SolutionsTable"
+                 DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+            <TextBlock FontSize="14"
+                       Padding="8"
+                       TextAlignment="Left">
+                <Bold>Solutions Table</Bold>
+                <LineBreak />
+                <LineBreak />
+                <Bold>Width</Bold> - Duct width in inches
+                <LineBreak />
+                <Bold>Height</Bold> - Duct height in inches
+                <LineBreak />
+                <Bold>Type</Bold> - Duct type, R is rectangular. FO is flat oval.
+                <LineBreak />
+                <Bold>PLPH</Bold> - Pressure loss in inches per hundred linear feet of duct run
+                <LineBreak />
+                <Bold>V FPM</Bold> - Air velocity in feet per minute
+                <LineBreak />
+                <Bold>AR</Bold> - Duct dimension aspect ratio. This table is initially sorted by this value.
+                <LineBreak />
+                <Bold>P FT</Bold> - Duct perimeter in feet. Use for comparing sheet metal use.
+                <LineBreak />
+                <LineBreak />
+                <BulletDecorator><BulletDecorator.Bullet><Ellipse Height="6"
+                                                                  Width="6"
+                                                                  Fill="Black"/></BulletDecorator.Bullet></BulletDecorator>
+                This table lists all the duct solutions meeting the design requirements. The LPH
+                <LineBreak />
+                boundary value allows less area and less material efficient ducts to meet the design.
+                <LineBreak />
+                <BulletDecorator><BulletDecorator.Bullet><Ellipse Height="6"
+                                                                  Width="6"
+                                                                  Fill="Black" /></BulletDecorator.Bullet></BulletDecorator>
+                The table is intially sorted by Aspect Ratio.
+                <LineBreak /><BulletDecorator><BulletDecorator.Bullet><Ellipse Height="6"
+                                                                               Width="6"
+                                                                               Fill="Black" /></BulletDecorator.Bullet></BulletDecorator>
+                Clicking on the list column headers sorts the table for that column value.
+            </TextBlock>
+        </ToolTip>
+
+
+        <!--Making a common tooltip for multiple places or a tooltip for some textblocks.-->
         <ToolTip x:Key="AirDeviceTally"
                  DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
             <TextBlock FontSize="14"
@@ -844,7 +887,11 @@
                                           AutoGenerateColumns="False"
                                           SelectionMode="Single"
                                           Margin="2,4,2,2"
-                                          SelectionChanged="SolutionsGrid_SelectionChanged">
+                                          SelectionChanged="SolutionsGrid_SelectionChanged"
+                                          ToolTipService.InitialShowDelay="800"
+                                          ToolTipService.ShowDuration="14000"
+                                          ToolTip="{StaticResource SolutionsTable}"
+                                          ToolTipService.IsEnabled="{Binding ShowTips, UpdateSourceTrigger=PropertyChanged, FallbackValue='False'}">
                                     <DataGrid.ColumnHeaderStyle>
                                         <Style TargetType="{x:Type DataGridColumnHeader}">
                                             <Setter Property="HorizontalAlignment"
