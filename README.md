@@ -37,7 +37,7 @@
 ![Duct-O-Matic](Images/Duct0Matic-05.PNG)
 
 ![Duct-O-Matic](Images/Duct0Matic-06.PNG)
-###### Moving and Closing
+### Window Moving and Closing
 -  Drag the window around to move it.
 -  Close the application by Pressing ESC key whenever the application has focus.
 
