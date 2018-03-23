@@ -8,7 +8,7 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("WpfaksDuctOMatic")]
-[assembly: AssemblyDescription("Duct-O-Matic, a air duct size selection application.")]
+[assembly: AssemblyDescription("Duct-O-Matic is an HVAC air duct size selection application faster and easier to use than a Ductulator.  For use information hover over DuctOMatic areas to see tool tips.  Please report any issues using the link below.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("WpfaksDuctOMatic")]
@@ -51,8 +51,8 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("3.2.0.0")]
+[assembly: AssemblyFileVersion("3.2.0.0")]
 [assembly: Guid("A6A6BA70-D9C1-46E5-88CA-89D0A9315D9A")]
 [assembly: NeutralResourcesLanguage("en-US")]
 
