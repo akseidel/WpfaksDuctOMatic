@@ -6,6 +6,7 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Navigation;
 
 namespace WpfaksDuctOMatic {
     public partial class MainWindow : Window {
@@ -950,6 +951,11 @@ namespace WpfaksDuctOMatic {
             return (delta >= deltacrit);
         }
 
-
+        private void Button_Click(object sender, RoutedEventArgs e) {
+            double thisCenterX = Left + ActualWidth / 2;
+            double thisCenterY = Top + ActualHeight / 2;
+            AboutBoxDuctOMatic aboutBoxDuctOMatic = new AboutBoxDuctOMatic(thisCenterX, thisCenterY);
+            aboutBoxDuctOMatic.ShowDialog();
+        }
     } /// main window class
 }

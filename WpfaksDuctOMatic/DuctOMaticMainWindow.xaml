@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfaksDuctOMatic"
-        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         WindowStyle="None"
         Background="Transparent"
@@ -23,6 +22,31 @@
         Loaded="Window_Loaded"
         Closing="Window_Closing">
 
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Window.Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Duration="00:00:0.2"
+                                     Storyboard.TargetProperty="Opacity"
+                                     To="0.8" />
+                    <DoubleAnimation Duration="00:00:0.2"
+                                     BeginTime="00:00:0.2"
+                                     Storyboard.TargetProperty="Opacity"
+                                     To="1" />
+                    <DoubleAnimation Duration="00:00:0.2"
+                                     BeginTime="00:00:0.4"
+                                     Storyboard.TargetProperty="Opacity"
+                                     To="0.8" />
+                    <DoubleAnimation Duration="00:00:0.2"
+                                     BeginTime="00:00:0.6"
+                                     Storyboard.TargetProperty="Opacity"
+                                     To="1" />
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Window.Triggers>
+    
+    
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <Style x:Key="{x:Type ToolTip}"
@@ -162,7 +186,6 @@
             </TextBlock>
         </ToolTip>
 
-
         <!--Making a common tooltip for multiple places or a tooltip for some textblocks.-->
         <ToolTip x:Key="AirDeviceTally"
                  DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
@@ -259,6 +282,18 @@
         </ToolTip>
 
         <!--Making a common tooltip for multiple places or a tooltip for some textblocks.-->
+        <ToolTip x:Key="AboutButton"
+                 DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+            <TextBlock FontSize="14"
+                       Padding="8"
+                       TextAlignment="Left">
+                <Bold>About This DuctOMatic</Bold>
+                <LineBreak />
+                Version, Author etc.
+            </TextBlock>
+        </ToolTip>
+
+        <!--Making a common tooltip for multiple places or a tooltip for some textblocks.-->
         <ToolTip x:Key="TurnOnToolTips"
                  DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
             <TextBlock FontSize="14"
@@ -266,9 +301,7 @@
                        TextAlignment="Left">
                 <Bold>Tool Tips</Bold>
                 <LineBreak />
-                Turn on documentation
-                <LineBreak />
-                tool tips.
+                Turn on documentation tool tips.
             </TextBlock>
         </ToolTip>
     </Window.Resources>
@@ -652,6 +685,8 @@
                           Padding="0,0,0,4"
                           ToolTipService.InitialShowDelay="800"
                           ToolTipService.ShowDuration="8000"
+                          ToolTipService.VerticalOffset="-200"
+                          ToolTipService.HorizontalOffset="400"
                           ToolTip="{StaticResource AirDeviceTally}"
                           ToolTipService.IsEnabled="{Binding ShowTips, UpdateSourceTrigger=PropertyChanged, FallbackValue='False'}">
                     <Grid x:Name="DeviceTally"
@@ -883,13 +918,15 @@
                                           HeadersVisibility="Column"
                                           HorizontalAlignment="Stretch"
                                           VerticalAlignment="Top"
-                                          VerticalScrollBarVisibility="Auto"
+                                          VerticalScrollBarVisibility="Visible"
                                           AutoGenerateColumns="False"
                                           SelectionMode="Single"
                                           Margin="2,4,2,2"
                                           SelectionChanged="SolutionsGrid_SelectionChanged"
                                           ToolTipService.InitialShowDelay="800"
                                           ToolTipService.ShowDuration="14000"
+                                          ToolTipService.VerticalOffset="-100"
+                                          ToolTipService.HorizontalOffset="-100"
                                           ToolTip="{StaticResource SolutionsTable}"
                                           ToolTipService.IsEnabled="{Binding ShowTips, UpdateSourceTrigger=PropertyChanged, FallbackValue='False'}">
                                     <DataGrid.ColumnHeaderStyle>
@@ -984,7 +1021,7 @@
                                            TextWrapping="Wrap"
                                            TextAlignment="Center"
                                            Width="70"
-                                           Padding="4,0"/>
+                                           Padding="4,0" />
                                 <Border BorderThickness="1"
                                         BorderBrush="DarkGray"
                                         Background="White"
@@ -993,10 +1030,10 @@
                                         ToolTipService.ShowDuration="14000"
                                         ToolTip="{StaticResource LPHBoundary}"
                                         ToolTipService.IsEnabled="{Binding ShowTips, UpdateSourceTrigger=PropertyChanged, FallbackValue='False'}">
-                                <Grid x:Name="LPHBoundary">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition />
-                                    </Grid.ColumnDefinitions>
+                                    <Grid x:Name="LPHBoundary">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
                                             <RowDefinition />
                                             <RowDefinition />
@@ -1009,20 +1046,20 @@
                                                Padding="4,0"
                                                Margin="0,0,0,2" />
                                         <Slider x:Name="LPHMarginSlider"
-                                        Grid.Row="1"
-                                        Grid.Column="0"
-                                        SmallChange="0.02"
-                                        LargeChange="0.10"
-                                        Maximum="1.0"
-                                        Minimum="0.10"
-                                        TickFrequency="0.1"
-                                        TickPlacement="BottomRight"
-                                        Height="30"
-                                        Value="{Binding Path=LphMargin, UpdateSourceTrigger=PropertyChanged, FallbackValue=0.50}"
-                                        HorizontalContentAlignment="Stretch"
-                                        VerticalContentAlignment="Stretch"
-                                        ValueChanged="LPHMarginSlider_ValueChanged" />
-                                </Grid>
+                                                Grid.Row="1"
+                                                Grid.Column="0"
+                                                SmallChange="0.02"
+                                                LargeChange="0.10"
+                                                Maximum="1.0"
+                                                Minimum="0.10"
+                                                TickFrequency="0.1"
+                                                TickPlacement="BottomRight"
+                                                Height="30"
+                                                Value="{Binding Path=LphMargin, UpdateSourceTrigger=PropertyChanged, FallbackValue=0.50}"
+                                                HorizontalContentAlignment="Stretch"
+                                                VerticalContentAlignment="Stretch"
+                                                ValueChanged="LPHMarginSlider_ValueChanged" />
+                                    </Grid>
                                 </Border>
                                 <Canvas x:Name="DuctSection"
                                         Height="60"
@@ -1057,6 +1094,18 @@
                                        Padding="4,0" />
                         </Grid>
                     </StackPanel>
+                    <Button Content="About This DuctOMatic"
+                            Visibility="{Binding ShowTips, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVis}, FallbackValue='Visible'}"
+                            Padding="4,0"
+                            Click="Button_Click"
+                            VerticalAlignment="Bottom"
+                            BorderThickness="0"
+                            BorderBrush="AliceBlue"
+                            Background="AliceBlue"
+                            ToolTipService.InitialShowDelay="500"
+                            ToolTipService.ShowDuration="2000"
+                            ToolTipService.VerticalOffset="-80"
+                            ToolTip="{StaticResource AboutButton}" />
                     <CheckBox x:Name="CheckBoxToolTips"
                               Content="Turn On Tool Tips"
                               DockPanel.Dock="Bottom"
@@ -1066,6 +1115,7 @@
                               Margin="4,12,20,0"
                               ToolTipService.InitialShowDelay="500"
                               ToolTipService.ShowDuration="2000"
+                              ToolTipService.VerticalOffset="-80"
                               ToolTip="{StaticResource TurnOnToolTips}" />
                 </DockPanel>
 
