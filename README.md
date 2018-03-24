@@ -44,6 +44,6 @@
 
 ###  Installation
 -  Download the zipped executable **[WpfaksDuctOMatic](BuiltAlready/WpfaksDuctOMatic.zip)**.
--  Unzip it and run it.
+-  Unzip it, allow your antivirus systems to scan it and then run it.
 -  The application first starts with default values, including its window position.
 -  The next time it runs it will reuse many values that were set when the application was last closed.
