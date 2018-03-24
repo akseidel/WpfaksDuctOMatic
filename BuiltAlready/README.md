@@ -3,4 +3,4 @@
 # HVAC Air Duct Size Design Tool
 ###  Installation
 -  This application runs in Windows.
--  **Download** **[WpfaksDuctOMatic](https://github.com/akseidel/WpfaksDuctOMatic/blob/master/BuiltAlready/WpfaksDuctOMatic.zip)** and run it.
+-  **Download** **[WpfaksDuctOMatic](/akseidel/WpfaksDuctOMatic/raw/master/BuiltAlready/WpfaksDuctOMatic.zip)** and run it.
