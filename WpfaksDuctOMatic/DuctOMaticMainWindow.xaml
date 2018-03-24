@@ -45,9 +45,18 @@
             </BeginStoryboard>
         </EventTrigger>
     </Window.Triggers>
-    
-    
+
+
     <Window.Resources>
+        <Style TargetType="ScrollBar">
+            <Setter Property="Width"
+                    Value="14" />
+            <Setter Property="MinWidth"
+                    Value="14" />
+            <Setter Property="Background"
+                    Value="White" />
+        </Style>
+
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <Style x:Key="{x:Type ToolTip}"
                TargetType="ToolTip">
@@ -170,7 +179,7 @@
                 <LineBreak />
                 <BulletDecorator><BulletDecorator.Bullet><Ellipse Height="6"
                                                                   Width="6"
-                                                                  Fill="Black"/></BulletDecorator.Bullet></BulletDecorator>
+                                                                  Fill="Black" /></BulletDecorator.Bullet></BulletDecorator>
                 This table lists all the duct solutions meeting the design requirements. The LPH
                 <LineBreak />
                 boundary value allows less area and less material efficient ducts to meet the design.
@@ -318,12 +327,14 @@
                                   MaxWidth="500" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
+                <RowDefinition Height="240*" />
+                <RowDefinition Height="239*" />
             </Grid.RowDefinitions>
             <StackPanel x:Name="LeftStack"
                         Orientation="Vertical"
                         Grid.Column="0"
-                        Grid.Row="0">
+                        Grid.Row="0"
+                        Grid.RowSpan="2">
                 <GroupBox Margin="4"
                           Header="Design Criteria">
                     <Grid>
@@ -824,7 +835,8 @@
                       ExpandDirection="Right"
                       Grid.Column="1"
                       Grid.Row="0"
-                      IsExpanded="{Binding Path=RecsolExpanded, UpdateSourceTrigger=PropertyChanged, FallbackValue=True}">
+                      IsExpanded="{Binding Path=RecsolExpanded, UpdateSourceTrigger=PropertyChanged, FallbackValue=True}"
+                      Grid.RowSpan="2">
                 <Expander.Header>
                     <TextBlock Text="Rectangular/Flat Oval Solutions"
                                Padding="6,0">

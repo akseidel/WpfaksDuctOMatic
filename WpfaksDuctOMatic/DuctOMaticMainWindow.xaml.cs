@@ -126,7 +126,6 @@ namespace WpfaksDuctOMatic {
             // Run the not busy backgroundworker with the current argument.
             if (!bwTableSolutions.IsBusy) {
                 string solTypeText = StrSoluT();
-                sessionModel.SolTable.Clear();
                 sessionModel.Ductshapevis = Visibility.Hidden;
                 sessionModel.SolutionsMsg = "Calculating " + solTypeText + " Solutions .......";
                 bwTableSolutions.RunWorkerAsync(thisTableSol);
@@ -174,6 +173,7 @@ namespace WpfaksDuctOMatic {
                 } else {
                     //// The process completed successfully.
                     sessionModel.SolTable = e.Result as SolutionsTable;
+
                     if (sessionModel.SolTable.Rows.Count > 0) {
                         // When DataTables are bound to DataGrids, the items seen in the window are
                         // DataRowViews that correspond to the DataTable's DataRows.
@@ -249,7 +249,7 @@ namespace WpfaksDuctOMatic {
                 _WtBot = wtLL;
                 _maxDuctW = Convert.ToInt32(wtUL);
             }
-            
+
             _typ = (dtype == 0 ? " R" : " FO");
             double DDLiner = 2 * dLiner;
             for (double ductHeight = _HtBot; ductHeight <= _maxDuctH; ductHeight += Dinc) {
@@ -276,25 +276,25 @@ namespace WpfaksDuctOMatic {
                             _area_sf = DAreaRO(wt, ductHeight, dtype);
                             _dVel = Vel(cfm, _area_sf);
                             // velocity limit check, if fails then skip this for
-                            if ((limitvelocity) && (_dVel > vellimit)) {continue;}
+                            if ((limitvelocity) && (_dVel > vellimit)) { continue; }
                             double drWt = wt + DDLiner;
                             double drHt = ductHeight + DDLiner;
                             double drPFT = DuctPFT(drWt, drHt, dtype);
                             DataRow dr = argSolTable.NewRow();
                             // inlist check, if already in list as reverse size then skip this solution
-                            if (InList(drHt, drWt, argSolTable)) {continue;}
+                            if (InList(drHt, drWt, argSolTable)) { continue; }
                             dr[0] = drWt;
                             dr[1] = "x";
                             dr[2] = drHt;
                             dr[3] = _typ;
-                            dr[4] = Math.Round(_tryLPH,3,MidpointRounding.AwayFromZero).ToString();
+                            dr[4] = Math.Round(_tryLPH, 3, MidpointRounding.AwayFromZero).ToString();
                             dr[5] = _dVel.ToString("#,##0");
-                            dr[6] = Math.Round((Math.Max(wt, ductHeight) / Math.Min(wt, ductHeight)),2, MidpointRounding.AwayFromZero).ToString("0.00");
+                            dr[6] = Math.Round((Math.Max(wt, ductHeight) / Math.Min(wt, ductHeight)), 2, MidpointRounding.AwayFromZero).ToString("0.00");
                             dr[7] = drPFT.ToString("0.00");
                             argSolTable.Rows.Add(dr);
                         }
                     }
-                    if (argSolTable.Rows.Count > 60) {break;}
+                    if (argSolTable.Rows.Count > 60) { break; }
                 }
             }
             // sort by aspect ratio first, then by pressure loss
@@ -306,15 +306,15 @@ namespace WpfaksDuctOMatic {
         }
 
         private void SetToNullState() {
-                sessionModel.StrEquivCircDiameter = "Diameter (IN): N/A";
-                sessionModel.StrEquivCircDuctPLPH = "PLPH (IN): N/A";
-                sessionModel.StrEquivCircDuctVel = "Velocity (FPM): N/A";
-                sessionModel.StrMaterialUse = "Material/FT (SF): N/A";
-                sessionModel.SolTable.Clear();
-                sessionModel.DesignMsg = string.Empty;
-                sessionModel.SolutionsMsg = string.Empty;
-                sessionModel.GraphicMsg = string.Empty;
-                ReportNonStandardPLPH();
+            sessionModel.StrEquivCircDiameter = "Diameter (IN): N/A";
+            sessionModel.StrEquivCircDuctPLPH = "PLPH (IN): N/A";
+            sessionModel.StrEquivCircDuctVel = "Velocity (FPM): N/A";
+            sessionModel.StrMaterialUse = "Material/FT (SF): N/A";
+            sessionModel.DesignMsg = string.Empty;
+            sessionModel.SolutionsMsg = string.Empty;
+            sessionModel.GraphicMsg = string.Empty;
+            sessionModel.SelrowSolTable = null;
+            ReportNonStandardPLPH();
         }
 
         /// <summary>
@@ -365,7 +365,7 @@ namespace WpfaksDuctOMatic {
                     REqCirDct = DhEqCircRO(manualHeight, manualWidth, dtype);
                     area_sf = DAreaRO(manualHeight, manualWidth, dtype);
                     double drPFT = DuctPFT(manualWidth, manualHeight, dtype);
-                    msg = "PLPH: " + Math.Round(CircDuctPLPH(cfm, REqCirDct, surfe, colebrook),3,MidpointRounding.AwayFromZero).ToString("0.000");
+                    msg = "PLPH: " + Math.Round(CircDuctPLPH(cfm, REqCirDct, surfe, colebrook), 3, MidpointRounding.AwayFromZero).ToString("0.000");
                     msg = msg + " IN  Velocity: " + Vel(cfm, area_sf).ToString("#,##0") + " FPM";
                     msg = msg + "  AR: " + (Math.Max(manualWidth, manualHeight) / Math.Min(manualWidth, manualHeight)).ToString("#.00");
                     msg = msg + "  P: " + drPFT.ToString("0.00");
@@ -402,22 +402,27 @@ namespace WpfaksDuctOMatic {
             SetToNullState();
             if (sessionModel.CFM <= 0) {
                 sessionModel.DesignMsg = "No go! Check the CFM.";
+                sessionModel.SolTable.Clear();
                 return true;
             }
             if (sessionModel.Lossperhundred <= 0) {
                 sessionModel.DesignMsg = "No go! Check the LPH.";
+                sessionModel.SolTable.Clear();
                 return true;
             }
             if (sessionModel.Surfe <= 0) {
                 sessionModel.DesignMsg = "No go! Check the Roughness.";
+                sessionModel.SolTable.Clear();
                 return true;
             }
             if ((sessionModel.WtLL <= 0) || (sessionModel.WtUL <= 0)) {
                 sessionModel.DesignMsg = "No go! Check width limit values.";
+                sessionModel.SolTable.Clear();
                 return true;
             }
             if ((sessionModel.HtLL <= 0) || (sessionModel.HtUL <= 0)) {
                 sessionModel.DesignMsg = "No go! Check height limit values.";
+                sessionModel.SolTable.Clear();
                 return true;
             }
             return false;
@@ -600,117 +605,6 @@ namespace WpfaksDuctOMatic {
                 CalcCircularAndTableSolutions();
                 CalcManualSolution();
             }
-        }
-
-        /// <summary>
-        /// Calculate the solutions table
-        /// </summary>
-        /// <param CFM in duct="cfm"></param>
-        /// <param pressure loss per hundred feet="lph"></param>
-        /// <param surface e="surfe"></param>
-        /// <param use colebrook="colebrook"></param>
-        /// <param limit velocity="limitvelocity"></param>
-        /// <param fpm velocity limit="vellimit"></param>
-        public void RectSolu(double cfm, double lph, double surfe, bool colebrook, bool limitvelocity, double vellimit) {
-            double TryLPH = 0;
-            double REqCirDct = 0;
-            int MaxDuct = 0;
-            int MaxDuctH = 0;
-            int MaxDuctW = 0;
-            double MaxAr = sessionModel.MaxAR;
-            double DLiner = sessionModel.Dliner;
-            double lphMargin = sessionModel.LphMargin;
-            int Dtype = sessionModel.Dtype;
-            double area_sf = 0;
-            string Typ = null;
-            double dVel = 0;
-            double HtBot = 0;
-            double WtBot = 0;
-            string solTypeText = StrSoluT();
-            MaxDuct = Convert.ToInt32(Math.Truncate((MaxAr - 1) * ReqEqvCirDuct(cfm, lph, surfe, colebrook, limitvelocity, vellimit)));
-            MaxDuct = Convert.ToInt32(Math.Max(MaxDuct, 6));
-            // limit lower size
-            MaxDuctH = MaxDuct;
-            MaxDuctW = MaxDuct;
-            HtBot = 6;
-            WtBot = 6;
-            if (sessionModel.ChkHRange) {
-                HtBot = sessionModel.HtLL;
-                MaxDuctH = Convert.ToInt32(sessionModel.HtUL);
-            }
-            if (sessionModel.ChkWRange) {
-                WtBot = sessionModel.WtLL;
-                MaxDuctW = Convert.ToInt32(sessionModel.WtUL);
-            }
-
-            if (HtBot == 0 | WtBot == 0 | MaxDuctH <= 0 | MaxDuctW <= 0) { return; }
-            sessionModel.SolutionsMsg = "Calculating " + solTypeText + " Solutions .......";
-
-            Typ = (sessionModel.Dtype == 0 ? " R" : " FO");
-            double DDLiner = 2 * DLiner;
-            sessionModel.SolTable.Clear();
-            sessionModel.Ductshapevis = Visibility.Hidden;
-            for (double ductHeight = HtBot; ductHeight <= MaxDuctH; ductHeight += Dinc) {
-                for (double wt = WtBot; wt <= MaxDuctW; wt += Dinc) {
-                    // check ar and even size first
-                    if ((Math.Max(wt, ductHeight) / Math.Min(wt, ductHeight) <= MaxAr) && ((wt + DDLiner) % 2 == 0) && ((ductHeight + DDLiner) % 2 == 0)) {
-                        REqCirDct = DhEqCircRO(ductHeight, wt, Dtype);
-                        TryLPH = CircDuctPLPH(cfm, REqCirDct, surfe, colebrook);
-                        // margin check
-                        if ((TryLPH <= lph) && (TryLPH > lphMargin * lph)) {
-                            area_sf = DAreaRO(wt, ductHeight, Dtype);
-                            dVel = Vel(cfm, area_sf);
-                            // velocity limit check, if fails then skip this for
-                            if ((sessionModel.ChkVelLimit) && (dVel > vellimit)) { continue; }
-                            double drWt = wt + DDLiner;
-                            double drHt = ductHeight + DDLiner;
-                            double drPFT = DuctPFT(drWt, drHt, Dtype);
-                            // inlist check, if already in list as reverse size then skip this solution
-                            //    if (InList(drWt, drHt)) { continue; }
-                            if (InList(drHt, drWt, sessionModel.SolTable)) { continue; }
-                            DataRow dr = sessionModel.SolTable.NewRow();
-                            dr[0] = drWt;
-                            dr[1] = "x";
-                            dr[2] = drHt;
-                            dr[3] = Typ;
-                            dr[4] = TryLPH.ToString("0.000");
-                            dr[5] = dVel.ToString("#,##0");
-                            dr[6] = (Math.Max(wt, ductHeight) / Math.Min(wt, ductHeight)).ToString("0.00");
-                            dr[7] = drPFT.ToString("0.00");
-                            sessionModel.SolTable.Rows.Add(dr);
-                        }
-                    }
-                    if (sessionModel.SolTable.Rows.Count > 60) { break; }
-                }
-            }
-            // sort by aspect ratio first, then by pressure loss
-            // This puts the most efficient section at the list top. 
-            // sessionModel.SolTable.DefaultView.Sort = "PFT ASC, AR ASC, PLPH DESC";
-            sessionModel.SolTable.DefaultView.Sort = "AR ASC, PLPH ASC";
-
-            if (sessionModel.SolTable.Rows.Count > 0) {
-                // When DataTables are bound to DataGrids, the items seen in the window are
-                // DataRowViews that correspond to the DataTable's DataRows.
-                DataRowView sdrv = sessionModel.SolTable.DefaultView[0] as DataRowView;
-                sessionModel.SelrowSolTable = sdrv;
-                UpDateDuctGraphic();
-            }
-
-            if (sessionModel.SolTable.Rows.Count == 0 && sessionModel.ChkVelLimit) {
-                string msg = "There are no solutions that meet all the criteria.";
-                msg = msg + "\n\n" + "Duct sizes can have an energy loss peformance much";
-                msg = msg + " better than how close the 'LPH Boundary' factor allows for";
-                msg = msg + " a selection when the 'LPH Boundary' value is high and the CFM is small.";
-                msg = msg + "\n\n" + "Duct sizes can also result in air velocities larger";
-                msg = msg + " than the velocity limit.";
-
-                sessionModel.SolutionsMsg = msg;
-                sessionModel.Ductshapevis = Visibility.Hidden;
-            } else {
-                sessionModel.SolutionsMsg = solTypeText + " Solutions: " + sessionModel.SolTable.Rows.Count.ToString();
-                sessionModel.Ductshapevis = Visibility.Visible;
-            }
-
         }
 
         /// <summary>

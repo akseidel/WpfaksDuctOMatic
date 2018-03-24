@@ -32,7 +32,6 @@ namespace WpfaksDuctOMatic {
         public DataRowView SelrowSolTable {
             get { return selrowSolTable; }
             set {
-                // if (selrowSolTable != value) {
                 selrowSolTable = value;
                 OnPropertyChanged("SelrowSolTable");
                 if (SelrowSolTable != null) {
@@ -40,7 +39,6 @@ namespace WpfaksDuctOMatic {
                 } else {
                     GraphicMsg = "";
                 }
-                // }
             }
         }
 
