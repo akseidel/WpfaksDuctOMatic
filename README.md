@@ -7,7 +7,7 @@
 
 ![Duct-O-Matic](Images/Duct0Matic-01.PNG)
 
-**Download:** **[WpfaksDuctOMatic.exe](https://github.com/akseidel/WpfaksDuctOMatic/blob/master/BuiltAlready/WpfaksDuctOMatic.exe)**
+**Download:** **[WpfaksDuctOMatic](BuiltAlready/WpfaksDuctOMatic.zip)**
 
 ##  How To Use
 
@@ -43,6 +43,7 @@
 -  Close the application by Pressing ESC key whenever the application has focus.
 
 ###  Installation
--  Download the executable **[WpfaksDuctOMatic.exe](https://github.com/akseidel/WpfaksDuctOMatic/blob/master/BuiltAlready/WpfaksDuctOMatic.exe)** and run it.
+-  Download the zipped executable **[WpfaksDuctOMatic](BuiltAlready/WpfaksDuctOMatic.zip)**.
+-  Unzip it and run it.
 -  The application first starts with default values, including its window position.
 -  The next time it runs it will reuse many values that were set when the application was last closed.
