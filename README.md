@@ -1,6 +1,5 @@
 #  WpfaksDuctOMatic&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;![](WpfaksDuctOMatic/DuctoMaticIcon.ico)
 
------
 #  HVAC Air Duct Size Design Tool
 
 -  DuctOMatic is a comprehensive, faster and more convenient HVAC duct size design tool than a manual Ductulator.
