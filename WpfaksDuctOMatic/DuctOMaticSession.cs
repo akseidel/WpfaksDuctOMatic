@@ -43,7 +43,13 @@ namespace WpfaksDuctOMatic {
         }
 
         private DataTable advTable = new AirDeviceTable();
-        public DataTable AdvTable { get { return advTable; } set { advTable = value; OnPropertyChanged("AdvTable"); } }
+        public DataTable AdvTable {
+            get { return advTable; }
+            set {
+                advTable = value;
+                OnPropertyChanged("AdvTable");
+            }
+        }
 
         private DataRowView selrowadvTable;
         public DataRowView SelrowadvTable {

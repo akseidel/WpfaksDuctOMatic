@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Navigation;
+using System.Windows.Threading;
 
 namespace WpfaksDuctOMatic {
     public partial class MainWindow : Window {
@@ -32,6 +36,7 @@ namespace WpfaksDuctOMatic {
         private void Window_Loaded(object sender, RoutedEventArgs e) {
             GetInits();
             SetUpBackgroundWorkers();
+            SetUpAirDevTable();
             RunSolutions();
         }
 
@@ -92,6 +97,18 @@ namespace WpfaksDuctOMatic {
 
             timerRetryUntilNotBusy = new Timer(10);  // polling delay, value determined by trial
             timerRetryUntilNotBusy.Elapsed += new ElapsedEventHandler(CheckBackgroundWorkerStateTimer_Elapsed);
+        }
+
+        /// <summary>
+        /// Sets up the first airdevice row so that there
+        /// are rows for the initial tally to be made.
+        /// </summary>
+        private void SetUpAirDevTable() {
+            DataRow dr = sessionModel.AdvTable.NewRow();
+            dr[0] = 0;
+            dr[1] = 0;
+            dr[2] = "Rm ";
+            sessionModel.AdvTable.Rows.Add(dr);
         }
 
         private void RunBackgroundWorkerTableSolutions(double cfm, double lph, double surfe, bool colebrook, bool limitvelocity, double vellimit) {
@@ -314,7 +331,7 @@ namespace WpfaksDuctOMatic {
             sessionModel.SolutionsMsg = string.Empty;
             sessionModel.GraphicMsg = string.Empty;
             sessionModel.SelrowSolTable = null;
-            ReportNonStandardPLPH();
+            ReportOnIncidentals();
         }
 
         /// <summary>
@@ -401,27 +418,27 @@ namespace WpfaksDuctOMatic {
         private bool FlunkCriticals() {
             SetToNullState();
             if (sessionModel.CFM <= 0) {
-                sessionModel.DesignMsg = "No go! Check the CFM.";
+                sessionModel.DesignMsg = "No go. Check the CFM.";
                 sessionModel.SolTable.Clear();
                 return true;
             }
             if (sessionModel.Lossperhundred <= 0) {
-                sessionModel.DesignMsg = "No go! Check the LPH.";
+                sessionModel.DesignMsg = "No go. Check the LPH.";
                 sessionModel.SolTable.Clear();
                 return true;
             }
             if (sessionModel.Surfe <= 0) {
-                sessionModel.DesignMsg = "No go! Check the Roughness.";
+                sessionModel.DesignMsg = "No go. Check the Roughness.";
                 sessionModel.SolTable.Clear();
                 return true;
             }
             if ((sessionModel.WtLL <= 0) || (sessionModel.WtUL <= 0)) {
-                sessionModel.DesignMsg = "No go! Check width limit values.";
+                sessionModel.DesignMsg = "No go. Check width limit values.";
                 sessionModel.SolTable.Clear();
                 return true;
             }
             if ((sessionModel.HtLL <= 0) || (sessionModel.HtUL <= 0)) {
-                sessionModel.DesignMsg = "No go! Check height limit values.";
+                sessionModel.DesignMsg = "No go. Check height limit values.";
                 sessionModel.SolTable.Clear();
                 return true;
             }
@@ -706,7 +723,10 @@ namespace WpfaksDuctOMatic {
             RunSolutions();
         }
 
-        private void TB_CFM_KeyUp(object sender, KeyEventArgs e) {
+        private void CFM_TextBox_KeyUp(object sender, KeyEventArgs e) {
+            if (sessionModel.ChkUseTally) {
+                sessionModel.ChkUseTally = false;
+            }
             RunSolutions();
         }
 
@@ -743,10 +763,6 @@ namespace WpfaksDuctOMatic {
             RunSolutions();
         }
 
-        //private void DoubleUpDown_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e) {
-        //    RunSolutions();
-        //}
-
         private void SolutionsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             UpDateDuctGraphic();
         }
@@ -762,46 +778,12 @@ namespace WpfaksDuctOMatic {
                 if ((Double.TryParse(dr[0].ToString(), out double devCFM)) && (Double.TryParse(dr[1].ToString(), out double devQty))) {
                     deviceSum += devCFM * devQty;
                 }
+
             }
             sessionModel.DeviceTally = deviceSum;
             if (sessionModel.ChkUseTally) {
                 sessionModel.StrCFM = deviceSum.ToString();
                 RunSolutions();
-            }
-        }
-
-        private void TallyGridEdit(object sender, EventArgs e) {
-            CalcAirDevices();
-        }
-
-        private void ChkUseTally_Click(object sender, RoutedEventArgs e) {
-            CalcAirDevices();
-        }
-
-        private void PressKey(Key key) {
-            KeyEventArgs args = new KeyEventArgs(Keyboard.PrimaryDevice, Keyboard.PrimaryDevice.ActiveSource, 0, key) {
-                RoutedEvent = Keyboard.KeyDownEvent
-            };
-            InputManager.Current.ProcessInput(args);
-        }
-
-        /// <summary>
-        /// Moves position in table to the right except at last entry
-        /// where it allows the row to be added and cursor flows naturally
-        /// down.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void TallyGrid_PreviewKeyDown(object sender, KeyEventArgs e) {
-            var uiElement = e.OriginalSource as UIElement;
-            if (e.Key == Key.Enter && uiElement != null) {
-                if (sender is DataGrid dgc) {
-                    int ccindx = dgc.CurrentColumn.DisplayIndex;
-                    if (ccindx < dgc.Columns.Count - 1) {
-                        uiElement.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
-                        e.Handled = true;
-                    }
-                }
             }
         }
 
@@ -820,19 +802,27 @@ namespace WpfaksDuctOMatic {
         /// Here when this event happens we assume the user has 'reselected' what was showing thinking that doing so
         /// will reset the PLPH. This function will reset the PLPH if in fact it is different.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void ComboDuctClass_DropDownClosed(object sender, EventArgs e) {
             if (IsPLPHNotMatchingWhatComboShow()) {
                 sessionModel.StrLossperhundred = sessionModel.PTypeSelected.D_PTypePLPH.ToString("0.00");
-                sessionModel.DesignMsg = "Reset PLPH to the standard value " + sessionModel.PTypeSelected.D_PTypePLPH.ToString("0.00");
+                sessionModel.DesignMsg = "Note: Did reset PLPH to the standard value " + sessionModel.PTypeSelected.D_PTypePLPH.ToString("0.00");
             }
         }
 
-        private void ReportNonStandardPLPH() {
+        private void ReportOnIncidentals() {
+            string theMsg = string.Empty;
+            string baseMsg = "Note:";
             if (IsPLPHNotMatchingWhatComboShow()) {
-                sessionModel.DesignMsg = "Note: The PLPH is set to a custom value.";
+                theMsg = baseMsg + " The PLPH is set to a custom value.";
             }
+            if (sessionModel.ChkUseTally) {
+                if (theMsg.Equals(string.Empty)) {
+                    theMsg = baseMsg + " CFM is the Air Device CFM Tally.";
+                } else {
+                    theMsg = theMsg + " CFM is the Air Device CFM Tally.";
+                }
+            }
+            sessionModel.DesignMsg = theMsg;
         }
 
         /// <summary>
@@ -850,6 +840,52 @@ namespace WpfaksDuctOMatic {
             double thisCenterY = Top + ActualHeight / 2;
             AboutBoxDuctOMatic aboutBoxDuctOMatic = new AboutBoxDuctOMatic(thisCenterX, thisCenterY);
             aboutBoxDuctOMatic.ShowDialog();
+        }
+
+        private void ChkUseTally_Click(object sender, RoutedEventArgs e) {
+            ReportOnIncidentals();
+            CalcAirDevices();
+        }
+
+        private void PressKey(Key key) {
+            KeyEventArgs args = new KeyEventArgs(Keyboard.PrimaryDevice, Keyboard.PrimaryDevice.ActiveSource, 0, key) {
+                RoutedEvent = Keyboard.KeyDownEvent
+            };
+            InputManager.Current.ProcessInput(args);
+        }
+
+        /// <summary>
+        /// Moves position in table to the right except at last entry
+        /// where it allows the row to be added and cursor flows naturally
+        /// down.
+        /// </summary>
+        private void TallyGrid_PreviewKeyDown(object sender, KeyEventArgs e) {
+            var uiElement = e.OriginalSource as UIElement;
+            if (e.Key == Key.Tab) {
+                TallyGrid.CommitEdit();
+                CalcAirDevices();
+                return;
+            }
+            if (e.Key == Key.Enter && uiElement != null) {
+                TallyGrid.CommitEdit();
+                CalcAirDevices();
+                if (sender is DataGrid dgc) {
+                    int ccindx = dgc.CurrentColumn.DisplayIndex;
+                    if (ccindx < dgc.Columns.Count - 1) {
+                        uiElement.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                        e.Handled = true;
+                    }
+                }
+            }
+        }
+
+        private void TallyGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e) {
+            CalcAirDevices();
+        }
+
+        private void TallyGrid_CurrentCellChanged(object sender, EventArgs e) {
+            TallyGrid.CommitEdit();
+            CalcAirDevices();
         }
     } /// main window class
 }

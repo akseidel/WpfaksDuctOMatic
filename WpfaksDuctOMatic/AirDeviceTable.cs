@@ -1,7 +1,6 @@
 ﻿using System.Data;
 
-namespace WpfaksDuctOMatic
-{
+namespace WpfaksDuctOMatic {
     internal class AirDeviceTable : DataTable {
         public AirDeviceTable() {
             Columns.Add("ADCFM", typeof(double));
@@ -10,3 +9,7 @@ namespace WpfaksDuctOMatic
         }
     }
 }
+
+
+
+

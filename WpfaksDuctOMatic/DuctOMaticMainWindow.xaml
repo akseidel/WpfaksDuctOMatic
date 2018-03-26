@@ -380,7 +380,7 @@
                                  VerticalContentAlignment="Center"
                                  VerticalAlignment="Center"
                                  Padding="4,2"
-                                 KeyUp="TB_CFM_KeyUp" />
+                                 KeyUp="CFM_TextBox_KeyUp" />
                         <GroupBox Grid.Column="4"
                                   Grid.Row="0"
                                   Grid.ColumnSpan="2"
@@ -708,8 +708,9 @@
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="100*" />
-                            <ColumnDefinition Width="100*" />
-                            <ColumnDefinition Width="100*" />
+                            <ColumnDefinition Width="100*"/>
+                            <ColumnDefinition Width="100*"
+                                              MinWidth="60" />
                             <ColumnDefinition Width="100*" />
                         </Grid.ColumnDefinitions>
                         <Button Content="Clear All Device Entries"
@@ -721,7 +722,7 @@
                         <TextBox Grid.Column="2"
                                  Grid.Row="0"
                                  IsReadOnly="True"
-                                 Text="{Binding Path=DeviceTally, UpdateSourceTrigger=PropertyChanged,FallbackValue=0.0}"
+                                 Text="{Binding Path=DeviceTally, StringFormat={}{0:n0}, UpdateSourceTrigger=PropertyChanged,FallbackValue=0.0}"
                                  HorizontalContentAlignment="Center"
                                  VerticalContentAlignment="Center"
                                  Margin="4,0" />
@@ -735,13 +736,13 @@
                                   Height="18"
                                   VerticalContentAlignment="Center"
                                   Click="ChkUseTally_Click" />
+
                         <DataGrid x:Name="TallyGrid"
                                   Grid.Column="0"
                                   Grid.Row="1"
                                   Grid.ColumnSpan="4"
                                   Width="556"
-                                  ItemsSource="{Binding Path=AdvTable, UpdateSourceTrigger=PropertyChanged}"
-                                  SelectedItem="{Binding Path=SelrowadvTable, UpdateSourceTrigger=PropertyChanged}"
+                                  ItemsSource="{Binding AdvTable}"
                                   IsReadOnly="False"
                                   CanUserResizeRows="False"
                                   CanUserDeleteRows="True"
@@ -750,18 +751,20 @@
                                   HeadersVisibility="All"
                                   CanUserSortColumns="True"
                                   AutoGenerateColumns="False"
-                                  SelectionMode="Extended"
+                                  SelectionMode="Single"
+                                  SelectionUnit="Cell"
                                   Margin="2,4,2,0"
                                   MaxHeight="200"
                                   VerticalScrollBarVisibility="Auto"
                                   IsSynchronizedWithCurrentItem="True"
                                   RowHeaderWidth="0"
-                                  CurrentCellChanged="TallyGridEdit"
-                                  PreviewKeyDown="TallyGrid_PreviewKeyDown"
                                   ToolTipService.InitialShowDelay="800"
                                   ToolTipService.ShowDuration="8000"
                                   ToolTip="{StaticResource AirDeviceTally}"
-                                  ToolTipService.IsEnabled="{Binding ShowTips, UpdateSourceTrigger=PropertyChanged, FallbackValue='False'}">
+                                  ToolTipService.IsEnabled="{Binding ShowTips, UpdateSourceTrigger=PropertyChanged, FallbackValue='False'}"
+                                  RowEditEnding="TallyGrid_RowEditEnding"
+                                  PreviewKeyDown="TallyGrid_PreviewKeyDown"
+                                  CurrentCellChanged="TallyGrid_CurrentCellChanged">
                             <DataGrid.ColumnHeaderStyle>
                                 <Style TargetType="{x:Type DataGridColumnHeader}">
                                     <Setter Property="HorizontalAlignment"
@@ -782,7 +785,7 @@
                             </DataGrid.RowStyle>
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Air Device CFM"
-                                                    Binding="{Binding Path=ADCFM,  UpdateSourceTrigger=PropertyChanged}"
+                                                    Binding="{Binding Path=ADCFM,  StringFormat={}{0:n0},UpdateSourceTrigger=LostFocus, Mode=TwoWay}"
                                                     Width="140">
                                     <DataGridTextColumn.ElementStyle>
                                         <Style>
@@ -797,7 +800,7 @@
                                 </DataGridTextColumn>
 
                                 <DataGridTextColumn Header="Qty"
-                                                    Binding="{Binding Path=QTY, StringFormat={}{0:n1}, UpdateSourceTrigger=PropertyChanged}"
+                                                    Binding="{Binding Path=QTY, StringFormat={}{0:n1}, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"
                                                     Width="50">
                                     <DataGridTextColumn.ElementStyle>
                                         <Style>
@@ -812,8 +815,10 @@
                                 </DataGridTextColumn>
 
                                 <DataGridTextColumn Header="Notes"
-                                                    Binding="{Binding Path=NOTES, UpdateSourceTrigger=PropertyChanged}"
+                                                    Binding="{Binding Path=NOTES, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"
                                                     Width="*">
+                                   
+
                                     <DataGridTextColumn.ElementStyle>
                                         <Style>
                                             <Setter Property="TextBlock.TextAlignment"
