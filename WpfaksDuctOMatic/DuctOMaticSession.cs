@@ -422,68 +422,19 @@ namespace WpfaksDuctOMatic {
 
         private double tallyTotal = 0;
         public double TallyTotal { get { return tallyTotal; } set { tallyTotal = value; OnPropertyChanged("TallyTotal"); } }
-
-        //public double savSurfe;
-        //private double saveSurfe;
-        //public double SaveSurfe { get { return saveSurfe; } set { saveSurfe = value; OnPropertyChanged("SaveSurfe"); } }
-
+        
         private double surfe = 0.0005;
         public double Surfe { get { return surfe; } set { surfe = value; OnPropertyChanged("Surfe"); } }
 
-        //public int ductPictCenterX;
-        //private double ductPictCenterX;
-        //public double DuctPictCenterX { get { return ductPictCenterX; } set { ductPictCenterX = value; OnPropertyChanged("DuctPictCenterX"); } }
-
-        ////public int ductPictCenterY;
-        //private double ductPictCenterY;
-        //public double DuctPictCenterY { get { return ductPictCenterY; } set { ductPictCenterY = value; OnPropertyChanged("DuctPictCenterY"); } }
-
-        //private double surfMR = 0.003;
-        //public double SurfMR { get { return surfMR; } set { surfMR = value; OnPropertyChanged("SurfMR"); } }
-
-        //private double surfAv = 0.0005;
-        //public double SurfAv { get { return surfAv; } set { surfAv = value; OnPropertyChanged("SurfAv"); } }
-
-        //////////static double DFwidthLimitLow = 6;
-        ////////private double dFwidthLimitLow = 6;
-        ////////public double DFwidthLimitLow { get { return dFwidthLimitLow; } set { dFwidthLimitLow = value; OnPropertyChanged("DFwidthLimitLow"); } }
-        //////////static double DFwidthLimitHigh = 120;
-        ////////private double dFwidthLimitHigh = 120;
-        ////////public double DFwidthLimitHigh { get { return dFwidthLimitHigh; } set { dFwidthLimitHigh = value; OnPropertyChanged("DFwidthLimitHigh"); } }
-        //////////static double DFheightLimitLow = 6;
-        ////////private double dFheightLimitLow = 6;
-        ////////public double DFheightLimitLow { get { return dFheightLimitLow; } set { dFheightLimitLow = value; OnPropertyChanged("DFheightLimitLow"); } }
-        //////////static double DFheightLimitHigh = 120;
-        ////////private double dFheightLimitHigh = 120;
-        ////////public double DFheightLimitHigh { get { return dFheightLimitHigh; } set { dFheightLimitHigh = value; OnPropertyChanged("DFheightLimitHigh"); } }
-
-
-        //private int dFPictWidth = 50;
-        //public int DFPictWidth { get { return dFPictWidth; } set { dFPictWidth = value; OnPropertyChanged("DFPictWidth"); } }
-        ////////////public double widthLimitLow = DFwidthLimitLow;
-        //////////private double widthLimitLow = 6;
-        //////////public double WidthLimitLow { get { return widthLimitLow; } set { widthLimitLow = value; OnPropertyChanged("WidthLimitLow"); } }
-        ////////////public double widthLimitHigh = DFwidthLimitHigh;
-        //////////private double widthLimitHigh = 120;
-        //////////public double WidthLimitHigh { get { return widthLimitHigh; } set { widthLimitHigh = value; OnPropertyChanged("WidthLimitHigh"); } }
-        ////////////public double heightLimitLow = DFheightLimitLow;
-        //////////private double heightLimitLow = 6;
-        //////////public double HeightLimitLow { get { return heightLimitLow; } set { heightLimitLow = value; OnPropertyChanged("HeightLimitLow"); } }
-        ////////////public double heightLimitHigh = DFheightLimitHigh;
-        //////////private double heightLimitHigh = 120;
-        //////////public double HeightLimitHigh { get { return heightLimitHigh; } set { heightLimitHigh = value; OnPropertyChanged("HeightLimitHigh"); } }
-
-
-        //lbEquivCircDiameter.Text = "Diameter: " + _REqCirDct + 2 * DLiner + " IN";
         private string strEquivCircDiameter = "Diameter (IN)= N/A";
         public string StrEquivCircDiameter { get { return strEquivCircDiameter; } set { strEquivCircDiameter = value; OnPropertyChanged("StrEquivCircDiameter"); } }
-        //     lbEqivCircDuctPLPH.Text = "PLPH: " + Strings.Format(_DDia_ft, "0.000") + " IN H2O";
+        
         private string strEquivCircDuctPLPH = "PLPH:";
         public string StrEquivCircDuctPLPH { get { return strEquivCircDuctPLPH; } set { strEquivCircDuctPLPH = value; OnPropertyChanged("StrEquivCircDuctPLPH"); } }
-        //lbEquivCircDuctVel.Text = "Velocity: " + Strings.Format(Vel(cfm, _area_sf), "#,##0") + " FPM";
+        
         private string strEquivCircDuctVel = "Velocity:";
         public string StrEquivCircDuctVel { get { return strEquivCircDuctVel; } set { strEquivCircDuctVel = value; OnPropertyChanged("StrEquivCircDuctVel"); } }
-        //LabelMaterialUse.Text = "Material/FT (SF): " + Strings.Format(_sfPft, "#,##0.00");
+        
         private string strMaterialUse = "Velocity:";
         public string StrMaterialUse { get { return strMaterialUse; } set { strMaterialUse = value; OnPropertyChanged("StrMaterialUse"); } }
 
@@ -500,17 +451,8 @@ namespace WpfaksDuctOMatic {
         // This is all about binding the duct smoothness combobox list and
         // the selected value (an object) in that list.
         public class DuctSmoothnessType {
-            private double d_surfe;
-            public double D_Surfe {
-                get { return d_surfe; }
-                set { d_surfe = value; }
-            }
-
-            private string s_surfedescription;
-            public string S_Surfedescription {
-                get { return s_surfedescription; }
-                set { s_surfedescription = value; }
-            }
+            public double D_Surfe { get; set; }
+            public string S_Surfedescription { get; set; }
         }
 
         // private part
@@ -543,8 +485,7 @@ namespace WpfaksDuctOMatic {
             }
         }
         #endregion
-
-
+        
         #region This is all about binding the duct pressureclass combobox
         //// This is all about binding the duct smoothness combobox list and
         //// the selected value (an object) in that list.
@@ -566,7 +507,6 @@ namespace WpfaksDuctOMatic {
                 get { return d_vellimit; }
                 set { d_vellimit = value; }
             }
-
         }
 
         //// private part
