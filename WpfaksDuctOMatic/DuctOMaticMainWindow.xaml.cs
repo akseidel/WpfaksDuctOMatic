@@ -27,7 +27,7 @@ namespace WpfaksDuctOMatic {
         static double DFheightLimitLow = 6;
         static double DFheightLimitHigh = 60;
         public int DFPictWidth = 50;
-
+        
         public MainWindow() {
             InitializeComponent();
             DataContext = sessionModel;
