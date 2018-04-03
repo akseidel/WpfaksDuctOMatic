@@ -13,6 +13,9 @@ namespace WpfaksDuctOMatic {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
 
+        private System.Windows.Media.Brush appbodybrush = ColorExt.ToBrush(System.Drawing.Color.AliceBlue);
+        public System.Windows.Media.Brush Appbodybrush { get { return appbodybrush; } set { appbodybrush = value; OnPropertyChanged("Appbodybrush"); } }
+        
         private Visibility ductshapevis = Visibility.Hidden;
         public Visibility Ductshapevis { get { return ductshapevis; } set { ductshapevis = value; OnPropertyChanged("Ductshapevis"); } }
 
@@ -84,28 +87,35 @@ namespace WpfaksDuctOMatic {
             set {
                 cFM = value;
                 OnPropertyChanged("CFM");
-                strcFM = value.ToString();
+                strcFM = String.Format("{0:n0}", cFM);
+                OnPropertyChanged("StrCFM");
             }
         }
-        private string strcFM = "1000";
+        private string strcFM = "1,000";
         public string StrCFM {
             get { return strcFM; }
             set {
-                CFM = TextEntry2Dbl(value);
-                strcFM = TextEntry2Str(value);
+                CFM = TextEntry2Dbl(value, cFM);
+                strcFM = String.Format("{0:n0}", CFM);
                 OnPropertyChanged("StrCFM");
                 //DesignMsg = "Changed StrCFM to " + StrCFM;
             }
         }
 
         private double velLimit = 1500.0;
-        public double VelLimit { get { return velLimit; } set { velLimit = value; OnPropertyChanged("VelLimit"); } }
-        private string strvelLimit = "1500";
+        public double VelLimit {
+            get { return velLimit; }
+            set {
+                velLimit = value;
+                OnPropertyChanged("VelLimit");
+            }
+        }
+        private string strvelLimit = "1,500";
         public string StrVelLimit {
             get { return strvelLimit; }
             set {
-                VelLimit = TextEntry2Dbl(value);
-                strvelLimit = TextEntry2Str(value);
+                VelLimit = TextEntry2Dbl(value, velLimit);
+                strvelLimit = String.Format("{0:n0}", VelLimit);
                 OnPropertyChanged("StrVelLimit");
                 //DesignMsg = "Changed StrVelLimit to " + StrVelLimit;
             }
@@ -116,32 +126,18 @@ namespace WpfaksDuctOMatic {
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        private double TextEntry2Dbl(string value) {
+        private double TextEntry2Dbl(string value, double org) {
             if (Double.TryParse(value, out double result)) {
                 return result;
             } else {
                 // if blank return 0
                 if (value.ToUpper() == String.Empty) {
                     return 0.0;
+                    //return org;
                 }
             }
-            return 0.0;
-        }
-
-        /// <summary>
-        /// Turns input into text as number if it looks like a number, blank if not a number.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        private string TextEntry2Str(string value) {
-            if (Double.TryParse(value, out double result)) {
-                return value;
-            } else {
-                if (value.ToUpper() == String.Empty) {
-                    return string.Empty;
-                }
-            }
-            return string.Empty;
+            //return 0.0;
+            return org;
         }
 
         private double wtLL = 6.0;
@@ -150,8 +146,8 @@ namespace WpfaksDuctOMatic {
         public string StrWtLL {
             get { return strwtLL; }
             set {
-                WtLL = TextEntry2Dbl(value);
-                strwtLL = TextEntry2Str(value);
+                WtLL = TextEntry2Dbl(value, wtLL);
+                strwtLL = String.Format("{0:n0}", WtLL);
                 OnPropertyChanged("StrWtLL");
                 //DesignMsg = "Changed WtLL " + WtLL.ToString();
             }
@@ -163,8 +159,8 @@ namespace WpfaksDuctOMatic {
         public string StrWtUL {
             get { return strwtUL; }
             set {
-                WtUL = TextEntry2Dbl(value);
-                strwtUL = TextEntry2Str(value);
+                WtUL = TextEntry2Dbl(value, wtUL);
+                strwtUL = String.Format("{0:n0}", WtUL);
                 OnPropertyChanged("StrWtUL");
                 //DesignMsg = "Changed WtUL " + WtUL.ToString();
             }
@@ -176,8 +172,8 @@ namespace WpfaksDuctOMatic {
         public string StrHtLL {
             get { return strhtLL; }
             set {
-                HtLL = TextEntry2Dbl(value);
-                strhtLL = TextEntry2Str(value);
+                HtLL = TextEntry2Dbl(value, htLL);
+                strhtLL = String.Format("{0:n0}", HtLL);
                 OnPropertyChanged("StrHtLL");
                 //DesignMsg = "Changed HtLL " + HtLL.ToString();
             }
@@ -189,8 +185,8 @@ namespace WpfaksDuctOMatic {
         public string StrHtUL {
             get { return strhtUL; }
             set {
-                HtUL = TextEntry2Dbl(value);
-                strhtUL = TextEntry2Str(value);
+                HtUL = TextEntry2Dbl(value, htUL);
+                strhtUL = String.Format("{0:n0}", HtUL);
                 OnPropertyChanged("StrHtUL");
                 //DesignMsg = "Changed HtUL " + HtUL.ToString();
             }
@@ -202,8 +198,8 @@ namespace WpfaksDuctOMatic {
         public string StrMaxAR {
             get { return strmaxAR; }
             set {
-                MaxAR = TextEntry2Dbl(value);
-                strmaxAR = TextEntry2Str(value);
+                MaxAR = TextEntry2Dbl(value, maxAR);
+                strmaxAR = String.Format("{0:n2}", MaxAR);
                 OnPropertyChanged("StrMaxAR");
                 //DesignMsg = "Changed MaxAR " + MaxAR.ToString();
             }
@@ -215,8 +211,8 @@ namespace WpfaksDuctOMatic {
         public string StrLossperhundred {
             get { return strlossperhundred; }
             set {
-                Lossperhundred = TextEntry2Dbl(value);
-                strlossperhundred = TextEntry2Str(value);
+                Lossperhundred = TextEntry2Dbl(value, lossperhundred);
+                strlossperhundred = String.Format("{0:n2}", Lossperhundred);
                 OnPropertyChanged("StrLossperhundred");
                 //DesignMsg = "Changed pressure loss/hundred feet to " + Lossperhundred.ToString();
             }
@@ -228,8 +224,8 @@ namespace WpfaksDuctOMatic {
         public string StrmanualWidth {
             get { return strmanualWidth; }
             set {
-                ManualWidth = TextEntry2Dbl(value);
-                strmanualWidth = TextEntry2Str(value);
+                ManualWidth = TextEntry2Dbl(value, manualWidth);
+                strmanualWidth = String.Format("{0:n0}", ManualWidth);
                 OnPropertyChanged("StrmanualWidth");
                 //DesignMsg = "Changed ManualWidth to " + ManualWidth.ToString();
             }
@@ -241,8 +237,8 @@ namespace WpfaksDuctOMatic {
         public string StrmanualHeight {
             get { return strmanualHeight; }
             set {
-                ManualHeight = TextEntry2Dbl(value);
-                strmanualHeight = TextEntry2Str(value);
+                ManualHeight = TextEntry2Dbl(value, manualHeight);
+                strmanualHeight = String.Format("{0:n0}", ManualHeight);
                 OnPropertyChanged("StrmanualHeight");
                 //DesignMsg = "Changed ManualHeight to " + ManualHeight.ToString();
             }
@@ -422,19 +418,19 @@ namespace WpfaksDuctOMatic {
 
         private double tallyTotal = 0;
         public double TallyTotal { get { return tallyTotal; } set { tallyTotal = value; OnPropertyChanged("TallyTotal"); } }
-        
+
         private double surfe = 0.0005;
         public double Surfe { get { return surfe; } set { surfe = value; OnPropertyChanged("Surfe"); } }
 
         private string strEquivCircDiameter = "Diameter (IN)= N/A";
         public string StrEquivCircDiameter { get { return strEquivCircDiameter; } set { strEquivCircDiameter = value; OnPropertyChanged("StrEquivCircDiameter"); } }
-        
+
         private string strEquivCircDuctPLPH = "PLPH:";
         public string StrEquivCircDuctPLPH { get { return strEquivCircDuctPLPH; } set { strEquivCircDuctPLPH = value; OnPropertyChanged("StrEquivCircDuctPLPH"); } }
-        
+
         private string strEquivCircDuctVel = "Velocity:";
         public string StrEquivCircDuctVel { get { return strEquivCircDuctVel; } set { strEquivCircDuctVel = value; OnPropertyChanged("StrEquivCircDuctVel"); } }
-        
+
         private string strMaterialUse = "Velocity:";
         public string StrMaterialUse { get { return strMaterialUse; } set { strMaterialUse = value; OnPropertyChanged("StrMaterialUse"); } }
 
@@ -457,7 +453,7 @@ namespace WpfaksDuctOMatic {
 
         // private part
         private List<DuctSmoothnessType> surfeChoices = new List<DuctSmoothnessType>(){
-            new DuctSmoothnessType(){ D_Surfe=0.0001, S_Surfedescription=  "0.0001 | Baby Ass Smooth - uncoated steel, PVC, Aluminum"}
+            new DuctSmoothnessType(){ D_Surfe=0.0001, S_Surfedescription=  "0.0001 | Very Smooth - uncoated steel, PVC, Aluminum"}
             ,new  DuctSmoothnessType(){ D_Surfe=0.0003, S_Surfedescription="0.0003 | Med. Smooth - Galvanized steel, spiral seam"}
             ,new  DuctSmoothnessType(){ D_Surfe=0.0005, S_Surfedescription="0.0005 | Average - Galvanized steel, 2.5 ft joints"}
             ,new  DuctSmoothnessType(){ D_Surfe=0.003, S_Surfedescription= "0.0030 | Med. Rough - Lined"}
@@ -485,7 +481,7 @@ namespace WpfaksDuctOMatic {
             }
         }
         #endregion
-        
+
         #region This is all about binding the duct pressureclass combobox
         //// This is all about binding the duct smoothness combobox list and
         //// the selected value (an object) in that list.
@@ -511,9 +507,9 @@ namespace WpfaksDuctOMatic {
 
         //// private part
         private List<DuctPClassType> ptypeChoices = new List<DuctPClassType>(){
-            new DuctPClassType(){ D_PTypePLPH=0.10, D_Vellimit= 1500, S_PTypedescription=  "Low_Pressure_Ducts  0.10 IN  1500 FPM"}
-            ,new  DuctPClassType(){ D_PTypePLPH=0.20, D_Vellimit= 2500, S_PTypedescription="Medium_Pressure_Ducts  0.20 IN  2500 FPM"}
-            ,new  DuctPClassType(){ D_PTypePLPH=0.40, D_Vellimit= 3500, S_PTypedescription="High_Pressure_Ducts  0.40 IN  3500 FPM"}
+            new DuctPClassType(){ D_PTypePLPH=0.10, D_Vellimit= 1500, S_PTypedescription=  "Low_Pressure_Ducts  0.10 IN  1,500 FPM"}
+            ,new  DuctPClassType(){ D_PTypePLPH=0.20, D_Vellimit= 2500, S_PTypedescription="Medium_Pressure_Ducts  0.20 IN  2,500 FPM"}
+            ,new  DuctPClassType(){ D_PTypePLPH=0.40, D_Vellimit= 3500, S_PTypedescription="High_Pressure_Ducts  0.40 IN  3,500 FPM"}
             ,new  DuctPClassType(){ D_PTypePLPH=0.03, D_Vellimit= 500, S_PTypedescription= "Transfer_Ducts  0.03 IN  500 FPM"}
         };
         //// public part
@@ -549,4 +545,5 @@ namespace WpfaksDuctOMatic {
         }
 
     }
+    
 }

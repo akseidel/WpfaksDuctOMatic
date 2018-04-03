@@ -46,7 +46,6 @@
         </EventTrigger>
     </Window.Triggers>
 
-
     <Window.Resources>
         <Style TargetType="ScrollBar">
             <Setter Property="Width"
@@ -316,7 +315,7 @@
     </Window.Resources>
 
     <Border x:Name="AppBody"
-            Background="AliceBlue"
+            Background="{Binding Path=Appbodybrush,  UpdateSourceTrigger=PropertyChanged, FallbackValue=AliceBlue}"
             CornerRadius="24"
             BorderThickness="3"
             BorderBrush="DarkGray">
@@ -357,9 +356,9 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto"
-                                              MinWidth="38" />
+                                              MinWidth="40" />
                             <ColumnDefinition Width="Auto"
-                                              MinWidth="38" />
+                                              MinWidth="40" />
                             <ColumnDefinition Width="Auto"
                                               MinWidth="30" />
                             <ColumnDefinition Width="Auto" />
@@ -375,12 +374,12 @@
                                  Grid.Column="1"
                                  Grid.Row="0"
                                  Grid.ColumnSpan="2"
-                                 Text="{Binding Path=StrCFM, UpdateSourceTrigger=PropertyChanged, FallbackValue=1000}"
+                                 Text="{Binding Path=StrCFM, StringFormat={}{0:n0}, UpdateSourceTrigger=PropertyChanged, FallbackValue='1,000'}"
                                  HorizontalContentAlignment="Center"
                                  VerticalContentAlignment="Center"
                                  VerticalAlignment="Center"
                                  Padding="4,2"
-                                 KeyUp="CFM_TextBox_KeyUp" />
+                                 TextChanged="TB_CFM_TextChanged" />
                         <GroupBox Grid.Column="4"
                                   Grid.Row="0"
                                   Grid.ColumnSpan="2"
@@ -439,7 +438,7 @@
                                  Grid.Column="1"
                                  Grid.Row="2"
                                  Grid.ColumnSpan="1"
-                                 Text="{Binding Path=StrLossperhundred, UpdateSourceTrigger=PropertyChanged, FallbackValue=0.01}"
+                                 Text="{Binding Path=StrLossperhundred, UpdateSourceTrigger=PropertyChanged, FallbackValue=0.10}"
                                  HorizontalContentAlignment="Center"
                                  VerticalContentAlignment="Center"
                                  Padding="4,2"
@@ -479,7 +478,7 @@
                                  Grid.Column="1"
                                  Grid.Row="3"
                                  Grid.ColumnSpan="2"
-                                 Text="{Binding Path=StrVelLimit, UpdateSourceTrigger=PropertyChanged, FallbackValue='1500'}"
+                                 Text="{Binding Path=StrVelLimit, StringFormat={}{0:n0}, UpdateSourceTrigger=PropertyChanged, FallbackValue='1,500'}"
                                  HorizontalContentAlignment="Center"
                                  VerticalContentAlignment="Center"
                                  VerticalAlignment="Center"

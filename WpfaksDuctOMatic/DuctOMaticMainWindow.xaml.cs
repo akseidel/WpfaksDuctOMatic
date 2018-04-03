@@ -23,11 +23,13 @@ namespace WpfaksDuctOMatic {
         public double d_inc = 1;
         public double PI = Math.PI;  //3.141592654
         static double DFwidthLimitLow = 6;
-        static double DFwidthLimitHigh = 60;
+        static double DFwidthLimitHigh = 120;
         static double DFheightLimitLow = 6;
-        static double DFheightLimitHigh = 60;
+        static double DFheightLimitHigh = 120;
         public int DFPictWidth = 50;
-        
+        private System.Windows.Media.Brush errbrush = ColorExt.ToBrush(System.Drawing.Color.MistyRose);
+        private System.Windows.Media.Brush normbrush = ColorExt.ToBrush(System.Drawing.Color.AliceBlue);
+
         public MainWindow() {
             InitializeComponent();
             DataContext = sessionModel;
@@ -418,30 +420,54 @@ namespace WpfaksDuctOMatic {
         private bool FlunkCriticals() {
             SetToNullState();
             if (sessionModel.CFM <= 0) {
-                sessionModel.DesignMsg = "No go. Check the CFM.";
+                sessionModel.DesignMsg = "====> The CFM value must be greater than zero.";
                 sessionModel.SolTable.Clear();
+                sessionModel.Appbodybrush = errbrush;
                 return true;
             }
             if (sessionModel.Lossperhundred <= 0) {
-                sessionModel.DesignMsg = "No go. Check the LPH.";
+                sessionModel.DesignMsg = "====>  The LPH value must be greater than zero.";
                 sessionModel.SolTable.Clear();
+                sessionModel.Appbodybrush = errbrush;
                 return true;
             }
             if (sessionModel.Surfe <= 0) {
-                sessionModel.DesignMsg = "No go. Check the Roughness.";
+                sessionModel.DesignMsg = "====> The roughness value must be greater than zero.";
                 sessionModel.SolTable.Clear();
+                sessionModel.Appbodybrush = errbrush;
                 return true;
             }
             if ((sessionModel.WtLL <= 0) || (sessionModel.WtUL <= 0)) {
-                sessionModel.DesignMsg = "No go. Check width limit values.";
+                sessionModel.DesignMsg = "====> The width limit values must be greater than zero.";
                 sessionModel.SolTable.Clear();
+                sessionModel.Appbodybrush = errbrush;
                 return true;
             }
             if ((sessionModel.HtLL <= 0) || (sessionModel.HtUL <= 0)) {
-                sessionModel.DesignMsg = "No go. Check height limit values.";
+                sessionModel.DesignMsg = "====> The height limit values must be greater than zero.";
                 sessionModel.SolTable.Clear();
+                sessionModel.Appbodybrush = errbrush;
                 return true;
             }
+            if ((sessionModel.ChkVelLimit) && (sessionModel.VelLimit == 0)) {
+                sessionModel.DesignMsg = "====> Air velocity is limited to nothing.";
+                sessionModel.SolTable.Clear();
+                sessionModel.Appbodybrush = errbrush;
+                return true;
+            }
+            if ((sessionModel.ChkVelLimit) && (sessionModel.VelLimit < 0)) {
+                sessionModel.DesignMsg = "====> Air velocity is limited to backwards flow.";
+                sessionModel.SolTable.Clear();
+                sessionModel.Appbodybrush = errbrush;
+                return true;
+            }
+            if (sessionModel.MaxAR <= 0) {
+                sessionModel.DesignMsg = "====> The aspect ratio value must be greater than zero.";
+                sessionModel.SolTable.Clear();
+                sessionModel.Appbodybrush = errbrush;
+                return true;
+            }
+            sessionModel.Appbodybrush = normbrush;
             return false;
         }
 
@@ -748,7 +774,7 @@ namespace WpfaksDuctOMatic {
         }
 
         private void TB_VELLIIMIT_TextChanged(object sender, TextChangedEventArgs e) {
-            if (sessionModel.ChkVelLimit && sessionModel.VelLimit > 0) { RunSolutions(); }
+            RunSolutions();
         }
 
         private void ManualRectSizeChanged_TextChanged(object sender, TextChangedEventArgs e) {
@@ -887,5 +913,21 @@ namespace WpfaksDuctOMatic {
             TallyGrid.CommitEdit();
             CalcAirDevices();
         }
+
+        private void TB_CFM_TextChanged(object sender, TextChangedEventArgs e) {
+            if (sessionModel.ChkUseTally) {
+                sessionModel.ChkUseTally = false;
+            }
+            RunSolutions();
+        }
     } /// main window class
+
+    /// <summary>
+    /// Used to convert system drawing colors to WPF brush
+    /// </summary>
+    public static class ColorExt {
+        public static System.Windows.Media.Brush ToBrush(System.Drawing.Color color) {
+            return new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B));
+        }
+    }
 }
