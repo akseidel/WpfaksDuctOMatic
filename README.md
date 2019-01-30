@@ -33,7 +33,7 @@
 ![Duct-O-Matic](Images/Duct0Matic-06.PNG)
 
 ###  Documentation
--  Documenation is accomplished with popup tips. The popup tool tips for the most important controls and features have explain their operation or purpose.
+-  Documenation is accomplished with popup tips. The popup tool tips for the most important controls and features explain their operation or purpose.
 -  Activate tool tips using the 'Turn On Tool Tips' check box.
 -  Hover over text and wait for the tool tip.
 
