@@ -1,6 +1,6 @@
 #  WpfaksDuctOMatic&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;![](WpfaksDuctOMatic/DuctoMaticIcon.ico)
 
-#  HVAC Air Duct Size Design Tool
+#  HVAC Air Duct Size Calculator
 
 -  DuctOMatic is a comprehensive, faster and more convenient HVAC duct size design tool than a manual Ductulator.
 
@@ -13,7 +13,7 @@
 -  Run the program. (This is a windows application.)
 -  Enter the air flow CFM.
 -  Select the duct liner choice. Duct sizes are the outside sheet metal sizes. The duct's air stream area is reduced by the duct liner. Be sure to select an appropriate surface roughness.
--  Select the surface roughness. The manual Ductulator does not account for surface roughness.
+-  Select the surface roughness. Note, a manual Ductulator does not account for surface roughness.
 -  Select or enter the design PLPH factor (pressure loss inches per hundred feet of duct). Selecting the duct pressure class with the pulldown resets the PLPH value.
 -  Enter and indicate any velocity limit the design needs.
 -  Select the duct shape type rectangular or flat oval.
@@ -33,8 +33,8 @@
 ![Duct-O-Matic](Images/Duct0Matic-06.PNG)
 
 ###  Documentation
--  The most important controls and features have popup tool tips to explain their operation or purpose.
--  Activate the 'Turn On Tool Tips' check box.
+-  Documenation is accomplished with popup tips. The popup tool tips for the most important controls and features have explain their operation or purpose.
+-  Activate tool tips using the 'Turn On Tool Tips' check box.
 -  Hover over text and wait for the tool tip.
 
 ### Window Moving and Closing
