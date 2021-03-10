@@ -47,6 +47,10 @@
     </Window.Triggers>
 
     <Window.Resources>
+
+        <local:TextInputToVisibilityConverter x:Key="TextInputToVisibilityConverter" />
+        
+        
         <Style TargetType="ScrollBar">
             <Setter Property="Width"
                     Value="14" />
@@ -326,14 +330,121 @@
                                   MaxWidth="500" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="240*" />
                 <RowDefinition Height="239*" />
             </Grid.RowDefinitions>
             <StackPanel x:Name="LeftStack"
                         Orientation="Vertical"
                         Grid.Column="0"
-                        Grid.Row="0"
+                        Grid.Row="1"
                         Grid.RowSpan="2">
+                
+                
+                <!--/// This is to be the session save section.-->
+                <Grid x:Name="SaveSession"
+                      Grid.Row="0"
+                      Grid.Column="0"
+                      Grid.ColumnSpan="6">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Description"
+                           Grid.Column="0"
+                           Grid.Row="0"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Top">
+                    </Label>
+
+                    <!-- Hint text overlay -->
+                    <TextBlock Margin="5,2"
+                               MinWidth="50"
+                               Grid.Row="0"
+                               Grid.Column="1"
+                               Grid.ColumnSpan="2"
+                               Text="Enter purpose here ..."
+                               Foreground="LightSteelBlue">
+                        <TextBlock.Visibility>
+                            <MultiBinding Converter="{StaticResource TextInputToVisibilityConverter}">
+                                <Binding ElementName="descriptionBox"
+                                         Path="Text.IsEmpty" />
+                                <Binding ElementName="descriptionBox"
+                                         Path="IsFocused" />
+                            </MultiBinding>
+                        </TextBlock.Visibility>
+                    </TextBlock>
+
+                    <TextBox  Name="descriptionBox"
+                              Grid.Row="0"
+                              Grid.Column="1"
+                              Grid.ColumnSpan="2"
+                              Background="Transparent"
+                              MinWidth="400"
+                              MaxWidth="420"
+                              TextWrapping="Wrap"
+                              AcceptsReturn="True"
+                              Text="{Binding Path=DesignDescription, UpdateSourceTrigger=PropertyChanged}"
+                              SpellCheck.IsEnabled="True"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Top"
+                              Padding="6,0"
+                              VerticalContentAlignment="Center" />
+
+                    <ComboBox IsEditable="True"
+                              Grid.Row="0"
+                              Grid.Column="3">
+                        
+                        
+                        
+                    </ComboBox>
+                    
+                    
+                    <Label Content="File Name"
+                           Grid.Column="0"
+                           Grid.Row="1"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Top">
+                    </Label>
+                    <TextBox  Grid.Row="1"
+                              Grid.Column="1"
+                              Grid.ColumnSpan="2"
+                              MinWidth="400"
+                              MaxWidth="420"
+                              TextWrapping="Wrap"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Center"
+                              Padding="6,0"
+                              VerticalContentAlignment="Center" />
+                    <Button Grid.Row="1"
+                            Grid.Column="3"
+                            Content="Save"
+                            HorizontalContentAlignment="Stretch"
+                            VerticalContentAlignment="Center"
+                            HorizontalAlignment="Right"
+                            Padding="6,2"
+                            VerticalAlignment="Center"
+                            BorderThickness="1" />
+                    <Button Grid.Row="1"
+                            Grid.Column="4"
+                            Content="Load"
+                            HorizontalContentAlignment="Stretch"
+                            VerticalContentAlignment="Center"
+                            HorizontalAlignment="Right"
+                            Padding="6,2"
+                            VerticalAlignment="Center"
+                            BorderThickness="1"/>
+                </Grid>
+                <!--/// End of the session save section.-->
+
                 <GroupBox Margin="4"
                           Header="Design Criteria">
                     <Grid>
@@ -364,6 +475,7 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
+
                         <Label Content="Air Flow (CFM)"
                                Grid.Column="0"
                                Grid.Row="0"
@@ -688,6 +800,7 @@
                     </Grid>
 
                 </GroupBox>
+                
                 <Expander x:Name="AirDeviceTally"
                           Header="Air Device Tabulator"
                           ExpandDirection="Down"

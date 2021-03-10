@@ -72,6 +72,9 @@ namespace WpfaksDuctOMatic {
             }
         }
 
+        private string designDescription = string.Empty;
+        public string DesignDescription { get { return designDescription; } set { designDescription = value; OnPropertyChanged("DesignDescription"); } }
+
         private string designMsg = string.Empty;
         public string DesignMsg { get { return designMsg; } set { designMsg = value; OnPropertyChanged("DesignMsg"); } }
 

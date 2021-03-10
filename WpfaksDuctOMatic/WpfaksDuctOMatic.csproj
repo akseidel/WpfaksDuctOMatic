@@ -71,6 +71,7 @@
     <Compile Include="SolutionsTable.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="TextInputToVisibilityConverter.cs" />
     <Page Include="AboutBoxDuctOMatic.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

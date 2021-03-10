@@ -818,6 +818,7 @@ namespace WpfaksDuctOMatic {
             timerRetryUntilNotBusy.Dispose();
             if (bwTableSolutions.IsBusy == true) { bwTableSolutions.Dispose(); }
             SaveState();
+          //  MessageBox.Show(sessionModel.AdvTable.Rows.Count.ToString());
         }
 
         private void LPHMarginSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
@@ -930,4 +931,5 @@ namespace WpfaksDuctOMatic {
             return new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B));
         }
     }
+   
 }
